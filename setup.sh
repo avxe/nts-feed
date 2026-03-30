@@ -14,6 +14,29 @@ set -euo pipefail
 # Always run from the project root (where this script lives)
 cd "$(dirname "$0")"
 
+FORCE_OVERWRITE=0
+NONINTERACTIVE=0
+
+for arg in "$@"; do
+    case "$arg" in
+        --force)
+            FORCE_OVERWRITE=1
+            ;;
+        --defaults|--non-interactive)
+            NONINTERACTIVE=1
+            ;;
+        *)
+            printf "Unknown option: %s\n" "$arg" >&2
+            printf "Usage: ./setup.sh [--force] [--defaults|--non-interactive]\n" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [ ! -r /dev/tty ]; then
+    NONINTERACTIVE=1
+fi
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -36,6 +59,10 @@ ask_yn() {
     # default: y or n
     local prompt="$1" default="${2:-y}"
     local hint
+    if [ "$NONINTERACTIVE" -eq 1 ]; then
+        [ "$default" = "y" ]
+        return
+    fi
     if [ "$default" = "y" ]; then hint="[Y/n]"; else hint="[y/N]"; fi
     printf "${BOLD}  %s %s: ${RESET}" "$prompt" "$hint"
     read -r answer </dev/tty
@@ -49,6 +76,10 @@ ask_yn() {
 ask_value() {
     # Usage: ask_value "prompt" [default]
     local prompt="$1" default="${2:-}"
+    if [ "$NONINTERACTIVE" -eq 1 ]; then
+        echo "$default"
+        return
+    fi
     if [ -n "$default" ]; then
         printf "${BOLD}  %s ${DIM}[%s]${RESET}${BOLD}: ${RESET}" "$prompt" "$default"
     else
@@ -95,7 +126,9 @@ ENV_FILE=".env"
 
 if [ -f "$ENV_FILE" ]; then
     warn "  An existing .env file was found."
-    if ! ask_yn "Overwrite it?" "n"; then
+    if [ "$FORCE_OVERWRITE" -eq 1 ]; then
+        dim "  Overwriting because --force was supplied."
+    elif ! ask_yn "Overwrite it?" "n"; then
         ok "  Keeping your existing .env. No changes were made."
         exit 0
     fi
@@ -204,32 +237,10 @@ echo ""
 # Scaffold data directories and seed files
 # ---------------------------------------------------------------------------
 
-# Docker bind-mounts a file source as a *directory* if it doesn't exist,
-# which crashes the app. Create required files/dirs up front.
-mkdir -p episodes thumbnails downloads data config/nginx/ssl
-[ -f shows.json ] || echo '{}' > shows.json
-
-# ---------------------------------------------------------------------------
-# SSL certificates (self-signed, for local HTTPS via nginx)
-# ---------------------------------------------------------------------------
-
-SSL_DIR="config/nginx/ssl"
-if [ -f "$SSL_DIR/fullchain.pem" ] && [ -f "$SSL_DIR/privkey.pem" ]; then
-    dim "  SSL certificates already exist — skipping generation."
-else
-    info "  Generating self-signed SSL certificate for localhost..."
-    mkdir -p "$SSL_DIR"
-    openssl req -x509 -nodes -days 3650 \
-        -newkey rsa:2048 \
-        -keyout "$SSL_DIR/privkey.pem" \
-        -out "$SSL_DIR/fullchain.pem" \
-        -subj "/CN=localhost" \
-        -addext "subjectAltName=DNS:localhost,IP:127.0.0.1" \
-        2>/dev/null
-    chmod 600 "$SSL_DIR/privkey.pem"
-    ok "  SSL certificate created (valid for 10 years)."
-    dim "  Note: Your browser will show a security warning — this is expected for self-signed certs."
-fi
+bootstrap_output="$(bash ./scripts/bootstrap-runtime.sh)"
+printf '%s\n' "$bootstrap_output" | while IFS= read -r line; do
+    [ -n "$line" ] && dim "  $line"
+done
 echo ""
 
 # ---------------------------------------------------------------------------
@@ -266,6 +277,9 @@ printf "     ${BOLD}make quickstart${RESET}\n"
 echo ""
 echo "  2. Open https://localhost in your browser"
 echo ""
+if [ "$NONINTERACTIVE" -eq 1 ]; then
+    dim "  Tip: setup.sh ran in non-interactive mode and used empty values for optional integrations."
+fi
 dim "  Tip: Run 'make docker-check' if Docker is installed but quickstart fails before build."
 dim "  Tip: Run 'docker compose logs -f web nginx' to watch startup progress."
 dim "  Tip: You can add or change API keys later by editing .env"

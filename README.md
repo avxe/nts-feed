@@ -33,6 +33,8 @@ If Docker is installed but `make quickstart` stops before build, run:
 make docker-check
 ```
 
+`make quickstart` also validates `.env`, repairs local runtime scaffolding such as `shows.json` and data directories, and fails early if ports `80` or `443` are already occupied.
+
 To watch what's happening:
 
 ```bash
@@ -65,6 +67,12 @@ python run.py
 ```
 
 Open [http://localhost:5555](http://localhost:5555).
+
+If you need a non-interactive `.env` bootstrap, run:
+
+```bash
+./setup.sh --defaults
+```
 
 ## Configuration
 

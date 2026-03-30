@@ -1,4 +1,4 @@
-.PHONY: help setup ensure-env quickstart install install-dev test lint format clean \
+.PHONY: help setup ensure-env env-check runtime-bootstrap quickstart install install-dev test lint format clean \
        docker-check docker-build docker-up docker-down docker-prod docker-dev docker-logs
 
 help: ## Show this help
@@ -19,7 +19,13 @@ ensure-env: ## Create .env if missing, otherwise reuse the existing file
 		bash ./setup.sh; \
 	fi
 
-quickstart: ensure-env docker-build docker-up ## Create .env if needed, then build and start containers
+env-check: ## Validate the current .env before startup
+	@bash ./scripts/check-env.sh --for-docker
+
+runtime-bootstrap: ## Ensure local runtime files and directories exist
+	@bash ./scripts/bootstrap-runtime.sh
+
+quickstart: ensure-env env-check runtime-bootstrap docker-build docker-up ## Create .env if needed, validate it, then build and start containers
 
 # ---------------------------------------------------------------------------
 # Local development
@@ -56,16 +62,16 @@ docker-check: ## Verify Docker, Compose/buildx, and the daemon are ready
 docker-build: docker-check ## Build Docker image
 	docker compose build
 
-docker-up: docker-check ## Start tracked dev containers
+docker-up: env-check runtime-bootstrap docker-check ## Start tracked dev containers
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 docker-down: ## Stop containers
 	docker compose down
 
-docker-prod: docker-check ## Start the production compose file only
+docker-prod: env-check runtime-bootstrap docker-check ## Start the production compose file only
 	docker compose -f docker-compose.yml up -d
 
-docker-dev: docker-check ## Foreground tracked dev stack
+docker-dev: env-check runtime-bootstrap docker-check ## Foreground tracked dev stack
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 docker-logs: docker-check ## Tail container logs

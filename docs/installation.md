@@ -18,7 +18,7 @@ make quickstart
 
 Open [https://localhost](https://localhost).
 
-`make quickstart` creates `.env` when needed, reuses an existing `.env` without prompting again, checks Docker prerequisites, builds the image, and starts the tracked dev stack.
+`make quickstart` creates `.env` when needed, reuses an existing `.env` without prompting again, validates the environment file, repairs local runtime scaffolding, checks Docker prerequisites, builds the image, and starts the tracked dev stack.
 
 If you want to manage setup and container startup separately:
 
@@ -35,6 +35,16 @@ make docker-check
 docker compose ps
 docker compose logs -f web nginx
 ```
+
+### What quickstart verifies for you
+
+- `.env` exists and `SECRET_KEY` is set
+- placeholder host mount paths from `env.example` are not still present
+- `shows.json` is a file, not a directory
+- runtime directories exist
+- local self-signed certs exist, or Docker can generate them later
+- Docker, Compose v2, `buildx`, and the daemon are available
+- ports `80` and `443` are free before nginx starts
 
 ### Manual smoke test
 
@@ -60,6 +70,12 @@ python run.py
 ```
 
 Open [http://localhost:5555](http://localhost:5555).
+
+If you need a non-interactive `.env` file with defaults for optional integrations:
+
+```bash
+./setup.sh --defaults
+```
 
 ## Configuration
 
@@ -102,7 +118,9 @@ python -m build --sdist --wheel
 
 - `Cannot connect to the Docker daemon`: start Docker, wait for it to finish booting, then rerun `make docker-check`.
 - `Docker Compose requires buildx plugin to be installed`: update Docker Desktop or install the Docker buildx plugin, then rerun `make docker-check`.
+- `SECRET_KEY is missing or still set to a placeholder value`: rerun `make setup` or edit `.env`, then rerun your command.
+- `AUTO_ADD_DIR_HOST` or `MUSIC_DIR_HOST` still points at `/absolute/path/...`: remove those lines or replace them with real host paths before using Docker.
 - Port `80` or `443` already in use: change nginx host port mappings.
 - HTTPS warning in browser: expected for the local self-signed certificate.
 - First load is slow: the app may be rebuilding the SQLite query store or warming assets.
-- `shows.json` errors on startup: rerun `make setup` so the bind-mounted file exists as a file, not a directory.
+- `shows.json` errors on startup: rerun `make runtime-bootstrap` so the bind-mounted file exists as a file, not a directory.
