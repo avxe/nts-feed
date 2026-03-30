@@ -1,0 +1,46 @@
+name: Bug report
+description: Report a reproducible problem in NTS Feed.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. Please give us a concrete reproduction so we can fix it quickly.
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Describe the bug and the expected behavior.
+      placeholder: A short description of the broken behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce
+      description: Provide a minimal sequence we can follow.
+      placeholder: |
+        1. Open ...
+        2. Click ...
+        3. See error ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Share the runtime context.
+      placeholder: |
+        - OS:
+        - Browser:
+        - Python version:
+        - Docker or local run:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Paste stack traces, network errors, or screenshots if available.

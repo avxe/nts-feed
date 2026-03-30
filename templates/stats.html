@@ -1,0 +1,84 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}Tracks - NTS Feed{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/stats.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/stats.css">
+{% endblock %}
+
+{% block content %}
+<div class="container stats-container" id="statsPageRoot" data-page="tracks">
+    <div class="page-header">
+        <div class="page-title-row">
+            <h1 class="page-title"><i class="fas fa-table"></i> Tracks</h1>
+        </div>
+    </div>
+
+    <input type="hidden" id="perPage" value="40">
+    <div class="page-controls stats-controls" id="statsControls" role="search" aria-label="Filter tracks">
+        <div class="control-group grow">
+            <div class="filter-input-wrap">
+                <input type="text" id="titleFilter" placeholder="Title" autocomplete="off" aria-label="Filter by track title">
+                <button type="button" class="filter-clear" aria-label="Clear title filter">&times;</button>
+            </div>
+        </div>
+        <div class="control-group grow">
+            <div class="filter-input-wrap">
+                <input type="text" id="artistFilter" placeholder="Artist" autocomplete="off" aria-label="Filter by artist">
+                <button type="button" class="filter-clear" aria-label="Clear artist filter">&times;</button>
+            </div>
+        </div>
+        <div class="control-group grow">
+            <div class="filter-input-wrap">
+                <input type="text" id="showFilter" placeholder="Show" autocomplete="off" aria-label="Filter by show">
+                <button type="button" class="filter-clear" aria-label="Clear show filter">&times;</button>
+                <div class="suggestions-dropdown" id="showSuggestions"></div>
+            </div>
+        </div>
+        <div class="control-group grow">
+            <div class="filter-input-wrap">
+                <input type="text" id="genresInput" placeholder="Genres" autocomplete="off" aria-label="Filter by genre">
+                <button type="button" class="filter-clear" aria-label="Clear genre filter">&times;</button>
+                <div class="suggestions-dropdown" id="genreSuggestions"></div>
+            </div>
+        </div>
+        <div class="control-group grow">
+            <div class="filter-input-wrap">
+                <input type="text" id="episodeFilterInput" placeholder="Episode" autocomplete="off" aria-label="Filter by episode">
+                <button type="button" class="filter-clear" aria-label="Clear episode filter">&times;</button>
+                <div class="suggestions-dropdown" id="episodeSuggestions"></div>
+            </div>
+        </div>
+    </div>
+
+    <div aria-live="polite" class="sr-only" id="statsStatus"></div>
+    <div class="stats-table-wrapper">
+        <table class="stats-table" id="statsTable" aria-label="Track statistics">
+            <colgroup id="statsColGroup">
+                <col data-col="0">
+                <col data-col="1">
+                <col data-col="2">
+                <col data-col="3">
+                <col data-col="4">
+                <col data-col="5">
+            </colgroup>
+            <thead class="stats-header" id="statsHeader">
+                <tr class="stats-header-row">
+                    <th class="col col-title sortable" data-sort="title" role="button" tabindex="0" scope="col" aria-sort="none">Track <span class="sort-ind"></span><span class="col-resizer" data-col="0"></span></th>
+                    <th class="col col-artists" scope="col">Artists<span class="col-resizer" data-col="1"></span></th>
+                    <th class="col col-plays sortable" data-sort="play_count" title="Play Count" role="button" tabindex="0" scope="col" aria-sort="none">Plays <span class="sort-ind"></span><span class="col-resizer" data-col="2"></span></th>
+                    <th class="col col-shows sortable" data-sort="shows_count" title="Distinct Shows" role="button" tabindex="0" scope="col" aria-sort="none">Shows <span class="sort-ind"></span><span class="col-resizer" data-col="3"></span></th>
+                    <th class="col col-genres" scope="col">Top Genres<span class="col-resizer" data-col="4"></span></th>
+                    <th class="col col-episodes" scope="col">Episodes</th>
+                </tr>
+            </thead>
+            <tbody class="stats-rows" id="statsRows"></tbody>
+        </table>
+        <div id="statsLoadMoreTrigger" class="load-more-trigger" aria-hidden="true"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/stats.js') }}?v={{ cache_bust }}" data-page-asset="js/stats.js"></script>
+{% endblock %}

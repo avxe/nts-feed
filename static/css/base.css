@@ -1,0 +1,229 @@
+/* ====================================
+   Base Styles
+======================================= */
+
+/* ====================================
+   Utility Classes
+======================================= */
+
+/* CSP-safe visibility toggle — use instead of inline style="display:none" */
+.hidden { display: none !important; }
+
+/* Sentinel element for IntersectionObserver-based infinite scroll */
+.load-more-trigger { height: 1px; }
+
+/* Progress bar initial state */
+.progress-fill--zero { width: 0%; }
+
+/* ====================================
+   Cross-Browser Reset & Normalize
+   Ensures consistent rendering across Safari, Chrome, Firefox
+======================================= */
+
+/* Universal box-sizing */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Remove loud blue focus outlines globally, use subtle alternative */
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 2px solid var(--color-text-tertiary);
+    outline-offset: 2px;
+}
+
+/* Normalize button and input appearance across browsers */
+button,
+input,
+select,
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Reset button styles completely for Safari */
+button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Ensure select maintains dropdown functionality */
+select {
+    cursor: pointer;
+}
+
+/* Prevent iOS font size adjustment */
+html {
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    background: var(--color-background);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    transition: background-color var(--transition-slow);
+    /* Font smoothing for consistent rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Normalize line-height across browsers */
+    line-height: 1.5;
+}
+
+a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+}
+
+.container {
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding: var(--container-padding);
+}
+
+h1 {
+    text-align: left;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    transition: color var(--transition-base);
+}
+
+[data-theme="dark"] h1 {
+    color: var(--color-dark-text-primary);
+}
+
+/* Legacy header styles - kept for backward compatibility, prefer page-layout.css classes */
+.header-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    -webkit-align-items: center;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+    box-sizing: border-box;
+}
+
+.title-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: calc(var(--spacing-base) * 2);
+}
+
+.controls {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    gap: 1rem;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+}
+
+.controls-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: calc(var(--spacing-base) * 2);
+}
+
+/* Sorting Controls */
+.sorting-controls {
+    display: flex;
+    align-items: center;
+}
+
+.sort-dropdown {
+    padding: calc(var(--spacing-base) * 1.5) calc(var(--spacing-base) * 2);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-secondary);
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    min-width: 140px;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(var(--spacing-base) * 1.5) center;
+    background-size: 16px;
+    transition: all var(--transition-base);
+    padding-right: calc(var(--spacing-base) * 5);
+}
+
+.sort-dropdown:hover {
+    filter: brightness(90%);
+}
+
+.sort-dropdown:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .sort-dropdown {
+        background: var(--color-dark-surface-alt);
+        border-color: var(--color-dark-border);
+        color: var(--color-dark-text-primary);
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b0b0b0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpath d='M6 9l6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right calc(var(--spacing-base) * 1.5) center;
+        background-size: 16px;
+    }
+    
+    .sort-dropdown:focus {
+        border-color: var(--color-dark-text-primary);
+    }
+}
+
+.back-link {
+    margin-right: 0;
+    width: 60px;
+    flex: 0 0 auto;
+}
+
+.back-link::before {
+    content: '←';
+}
+
+.download-buttons {
+    display: -webkit-flex;
+    display: flex;
+    gap: calc(var(--spacing-base) * 2);
+    -webkit-flex: 0 0 auto;
+    flex: 0 0 auto;
+}
+
+.hidden {
+    display: none !important;
+    visibility: hidden !important;
+} 

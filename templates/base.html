@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}NTS Feed{% endblock %}</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32">
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}?v={{ cache_bust }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Page-specific CSS -->
+    {% block styles %}{% endblock %}
+</head>
+<body>
+    <!-- SPA Loading indicator -->
+    <div class="spa-loading-bar" id="spaLoadingBar"></div>
+    
+    <!-- Global Navigation Header - persists across SPA navigation -->
+    <header class="global-header">
+        <div class="global-header-inner">
+            <a href="{{ url_for('pages.index') }}" class="global-header-title">
+                <h1>NTS Feed</h1>
+            </a>
+            <div class="global-header-controls">
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <div class="search-input-container">
+                            <input 
+                                type="text" 
+                                id="globalSearch" 
+                                placeholder="Search"
+                                class="search-input"
+                                autocomplete="off"
+                                aria-label="Search across all shows by artist, track, or genre"
+                            >
+                        </div>
+                        <button type="button" class="search-clear" aria-label="Clear search" title="Clear">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <nav class="global-nav">
+                    <a href="{{ url_for('pages.shows_page') }}" class="global-nav-link" aria-label="Shows">
+                        <i class="fas fa-broadcast-tower"></i>
+                        <span>Shows</span>
+                    </a>
+                    <a href="/discover" class="global-nav-link" aria-label="Discover">
+                        <i class="fas fa-compass"></i>
+                        <span>Discover</span>
+                    </a>
+                    <a href="{{ url_for('pages.likes_page') }}" class="global-nav-link" aria-label="Liked Tracks">
+                        <i class="fas fa-heart"></i>
+                        <span>Likes</span>
+                    </a>
+                    <a href="{{ url_for('pages.stats_page') }}" class="global-nav-link" aria-label="Tracks">
+                        <i class="fas fa-table"></i>
+                        <span>Tracks</span>
+                    </a>
+                    <button id="openSubscribeModalButton" class="global-nav-action" aria-label="Subscribe to a show">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Show</span>
+                    </button>
+                    <a href="/admin" class="global-nav-link global-nav-link--admin" aria-label="Admin" title="Admin Dashboard">
+                        <i class="fas fa-cog"></i>
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Global search results container -->
+    <div class="global-search-results-wrapper">
+        <div class="episodes-list hidden" id="searchEpisodesContainer"></div>
+    </div>
+    
+    <!-- Main page content container - replaced on SPA navigation -->
+    <div id="page-content">
+        {% block content %}{% endblock %}
+        
+        {# Page-specific inline data #}
+        {% block page_data %}{% endblock %}
+        
+        {# Page-specific inline scripts #}
+        {% block inline_scripts %}{% endblock %}
+    </div>
+    
+    <!-- Persistent elements - stay outside #page-content -->
+    <div id="notifications"></div>
+    
+    {# Subscribe Modal - global since button is in header #}
+    <div id="subscribeModal" class="subscribe-modal" aria-hidden="true">
+        <div class="subscribe-modal-content" role="dialog" aria-modal="true" aria-labelledby="subscribeModalTitle">
+            <div class="subscribe-modal-header">
+                <h3 id="subscribeModalTitle">Subscribe to a show</h3>
+                <button type="button" class="subscribe-modal-close" id="closeSubscribeModal" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="subscribe-modal-body">
+                <form class="subscribe-form" id="subscribeForm">
+                    <input 
+                        type="url" 
+                        id="subscribeUrl"
+                        name="url" 
+                        placeholder="Enter NTS show URL" 
+                        required
+                        autocomplete="off"
+                        aria-label="NTS show URL"
+                    >
+                    <button type="submit">
+                        <span class="button-text">Subscribe</span>
+                        <span class="loading-spinner"></span>
+                    </button>
+                </form>
+                 <div id="subscribeProgress" class="hidden">
+                     <div class="progress-row">
+                         <div class="status">Preparing…</div>
+                         <div class="count"></div>
+                     </div>
+                     <div class="bar">
+                         <div class="bar-fill"></div>
+                     </div>
+                 </div>
+                <p class="helper-text">Paste a show page URL from NTS Radio to add it to your list.</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- YouTube player container - persists across page navigation -->
+    <div id="youtube-player-root"></div>
+    
+    <!-- Side drawer for track info - persists across navigation -->
+    <div class="sidedrawer-overlay"></div>
+    <div class="sidedrawer">
+        <div class="sidedrawer-header">
+            <button class="sidedrawer-close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="sidedrawer-content"></div>
+    </div>
+    
+    <!-- Global scripts - order matters -->
+    <script src="{{ url_for('static', filename='js/utils.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/notifications.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/youtube-player-global.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/global-search.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/track-info.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/page-modules.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', filename='js/spa-router.js') }}?v={{ cache_bust }}"></script>
+    
+    <!-- Page-specific scripts -->
+    {% block page_scripts %}{% endblock %}
+    
+    <!-- Initialize SPA after page scripts are loaded (external for CSP compliance) -->
+    <script src="{{ url_for('static', filename='js/app-init.js') }}?v={{ cache_bust }}"></script>
+</body>
+</html>

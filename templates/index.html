@@ -1,0 +1,37 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}NTS Feed{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/feed.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/feed.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    
+    <div class="episodes-list" id="episodesFeed">
+        {% for episode in episodes %}
+        {% with episode=episode, show_link_url=episode.show_url, show_link_title=episode.show_title, episode_href=(episode.url or episode.audio_url) %}
+        {% include '_episode_list_item.html' %}
+        {% endwith %}
+        {% else %}
+        <div class="feed-empty">
+            <i class="fas fa-broadcast-tower feed-empty-icon"></i>
+            <h3>No episodes yet</h3>
+            <p>Subscribe to some shows to see their latest episodes here.</p>
+            <button id="openSubscribeFromFeed" class="feed-subscribe-btn">
+                <i class="fas fa-plus"></i>
+                <span>Add a Show</span>
+            </button>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/nts-audio-player.js') }}?v={{ cache_bust }}" data-page-asset="js/nts-audio-player.js"></script>
+<script src="{{ url_for('static', filename='js/downloads.js') }}?v={{ cache_bust }}" data-page-asset="js/downloads.js"></script>
+<script src="{{ url_for('static', filename='js/show-page.js') }}?v={{ cache_bust }}" data-page-asset="js/show-page.js"></script>
+<script src="{{ url_for('static', filename='js/feed-page.js') }}?v={{ cache_bust }}" data-page-asset="js/feed-page.js"></script>
+{% endblock %}

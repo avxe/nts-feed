@@ -1,0 +1,30 @@
+name: Feature request
+description: Propose an improvement or extension for NTS Feed.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      placeholder: Describe the user need or workflow gap.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      placeholder: Describe the desired behavior or API.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: List any workarounds or other approaches you considered.
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      placeholder: Mockups, links, or implementation notes.

@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security report
+    url: https://github.com/avxe/nts-feed/security/advisories/new
+    about: Please use private GitHub security advisories for vulnerability reports.

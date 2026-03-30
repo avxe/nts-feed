@@ -1,0 +1,75 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}{{ show_data.title }} - NTS Subscribe{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/show.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/show.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+        <div class="page-title-row">
+            <h1 class="page-title">{{ show_data.title }}</h1>
+            <div class="page-actions">
+                <div class="show-menu-container">
+                    <button class="show-menu-trigger" aria-label="Show actions" title="Show actions"
+                        data-auto-download="{{ 'true' if show_data.auto_download else 'false' }}">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <div class="show-menu-dropdown">
+                        <div class="show-menu-item" data-action="update-show">
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Update Show</span>
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <div class="show-menu-item" data-action="download-all">
+                            <i class="fas fa-download"></i>
+                            <span>Download All Episodes</span>
+                            <div class="loading-spinner"></div>
+                        </div>
+                        <div class="show-menu-item" data-action="toggle-auto-download" 
+                            data-enabled="{{ 'true' if show_data.auto_download else 'false' }}">
+                            <i class="fas fa-magic"></i>
+                            <span>Auto-download</span>
+                            <span class="auto-status">{{ 'On' if show_data.auto_download else 'Off' }}</span>
+                            <div class="loading-spinner"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search search-icon"></i>
+                        <div class="search-input-container">
+                            <input type="text" id="genreSearch" placeholder="Genre" class="search-input"
+                                autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <button id="stopAllButton" class="stop-all-button hidden">
+                    <span>Stop All Downloads</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="episodes-list" id="episodesList" data-show-url="{{ show_url }}"
+        data-total="{{ show_data.total_episodes }}" data-per-page="{{ show_data.per_page }}" data-page="1">
+        {% if show_data.new_episodes > 0 %}
+        {% endif %}
+        {% for episode in show_data.episodes %}
+        {% with episode=episode, show_link_url=None, show_link_title=None, episode_href=episode.url %}
+        {% include '_episode_list_item.html' %}
+        {% endwith %}
+        {% endfor %}
+    </div>
+    <div id="loadMoreTrigger" class="load-more-trigger" aria-hidden="true"></div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/nts-audio-player.js') }}?v={{ cache_bust }}" data-page-asset="js/nts-audio-player.js"></script>
+<script src="{{ url_for('static', filename='js/downloads.js') }}?v={{ cache_bust }}" data-page-asset="js/downloads.js"></script>
+<script src="{{ url_for('static', filename='js/genre-search.js') }}?v={{ cache_bust }}" data-page-asset="js/genre-search.js"></script>
+<script src="{{ url_for('static', filename='js/show-page.js') }}?v={{ cache_bust }}" data-page-asset="js/show-page.js"></script>
+{% endblock %}

@@ -1,0 +1,66 @@
+/* SPA Page Transitions
+ * Moved from inline <style> block in base.html for CSP compliance
+ */
+
+/* Utility class to replace inline style="display:none" */
+.hidden {
+    display: none !important;
+}
+
+/* Page transition styles */
+#page-content {
+    transition: opacity 0.15s ease;
+}
+
+#page-content.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* SPA loading indicator bar */
+.spa-loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: var(--color-text-primary);
+    z-index: 9999;
+    transition: width 0.2s ease;
+    opacity: 0;
+}
+
+.spa-loading-bar.active {
+    opacity: 1;
+}
+
+/* Subscribe progress modal styles (moved from inline) */
+#subscribeProgress {
+    margin-top: 10px;
+}
+
+#subscribeProgress .progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+}
+
+#subscribeProgress .status,
+#subscribeProgress .count {
+    font-size: 0.9rem;
+    color: var(--color-text-secondary);
+}
+
+#subscribeProgress .bar {
+    height: 6px;
+    background: var(--color-surface-alt);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+#subscribeProgress .bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--color-primary);
+    transition: width 0.25s ease;
+}

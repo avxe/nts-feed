@@ -1,0 +1,107 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}Shows - NTS Feed{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/shows.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/shows.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="index-controls">
+        <form class="update-form" id="updateForm">
+            <button type="submit" title="Update All Shows">
+                <span class="button-text">
+                    <i class="fas fa-sync-alt"></i>
+                    <span class="button-label">Update All</span>
+                </span>
+                <span class="loading-spinner"></span>
+            </button>
+        </form>
+        <div class="sorting-controls">
+            <select id="sortSelect" class="sort-dropdown">
+                <option value="updated">Newest Episode</option>
+                <option value="added">Recently Added</option>
+                <option value="name">A–Z</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="shows-list" id="showsList">
+        {% for url, show in subscriptions.items()|reverse %}
+        {% set new_episodes_count = show.new_episodes or 0 %}
+        <div class="show-item" 
+             data-name="{{ show.title|lower }}"
+             data-latest-episode="{{ show.latest_episode_date or '1970-01-01T00:00:00' }}"
+             data-new-episodes="{{ new_episodes_count }}"
+             data-total-episodes="{{ show.total_episodes or 0 }}"
+             data-added="{{ show.first_seen or '1970-01-01T00:00:00' }}"
+             data-show-url="{{ url }}">
+            <div class="show-content">
+                {% if show.thumbnail %}
+                <div class="show-thumbnail-container">
+                    <a href="{{ url_for('pages.show', url=url) }}">
+                        <img src="{{ url_for('thumbs.cached_thumbnail') }}?url={{ show.thumbnail | urlencode }}" alt="{{ show.title }}" class="show-thumbnail" loading="lazy" decoding="async">
+                    </a>
+                </div>
+                {% endif %}
+                <div class="show-details">
+                    <a href="{{ url_for('pages.show', url=url) }}" class="show-title">{{ show.title }}</a>
+                    {% if show.description %}
+                    <p class="show-description">{{ show.description }}</p>
+                    {% endif %}
+                    <div class="show-stats">
+                        <span class="episode-count">{{ show.total_episodes }} episodes</span>
+                        {% if new_episodes_count > 0 %}
+                        <span class="new-badge">{{ new_episodes_count }} new</span>
+                        {% endif %}
+                        {% if show.auto_download %}
+                        <span class="auto-download-badge" title="Auto-download enabled">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                            </svg>
+                            <span>Auto</span>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="show-right-section">
+                {% if show.latest_episode_date %}
+                <span class="last-updated" title="Latest episode: {{ show.latest_episode_date }}">
+                    <span class="relative-time" data-timestamp="{{ show.latest_episode_date }}"></span>
+                </span>
+                {% endif %}
+                <div class="show-menu-container">
+                <button class="show-menu-trigger" data-show-url="{{ url }}" data-auto-download="{{ show.auto_download|default(false)|tojson }}">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <div class="show-menu-dropdown">
+                    <div class="show-menu-item" data-action="update">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Update Show</span>
+                    </div>
+                    <div class="show-menu-item" data-action="download-all">
+                        <i class="fas fa-download"></i>
+                        <span>Download All Episodes</span>
+                    </div>
+                    <div class="show-menu-item" data-action="toggle-auto-download">
+                        <i class="fas fa-magic"></i>
+                        <span>Auto Download: <span class="auto-status">{{ 'On' if show.auto_download else 'Off' }}</span></span>
+                    </div>
+                    <div class="show-menu-item show-menu-item-danger" data-action="delete">
+                        <i class="fas fa-trash-alt"></i>
+                        <span>Delete Show</span>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/index-page.js') }}?v={{ cache_bust }}" data-page-asset="js/index-page.js"></script>
+{% endblock %}

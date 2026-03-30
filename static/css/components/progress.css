@@ -1,0 +1,39 @@
+/* ====================================
+   Download Progress
+======================================= */
+
+.download-progress {
+    display: none;
+    margin-top: var(--spacing-base);
+    width: 100%;
+}
+
+.progress-bar {
+    height: 4px;
+    background: var(--color-surface-alt);
+    border-radius: var(--border-radius-sm);
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: var(--progress-width, 0%);
+    background: var(--color-primary);
+    transition: width 0.3s ease;
+}
+
+.progress-info {
+    font-size: 0.85em;
+    color: var(--color-text-secondary);
+    margin-top: calc(var(--spacing-base) * 0.5);
+}
+
+/* Adjust progress bar fill */
+.progress-bar[style*="width"] {
+    background: var(--color-primary);
+} 

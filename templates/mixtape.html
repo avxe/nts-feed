@@ -1,0 +1,77 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}Discover - NTS Feed{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/discover.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/discover.css">
+{% endblock %}
+
+{% block content %}
+<div class="container discover-container" data-discover-page="true">
+    <header class="discover-header">
+        <div class="discover-header__top">
+            <h1 class="discover-title">Discover</h1>
+            <button id="discoverSurpriseBtn" class="surprise-btn" title="Surprise me">
+                <i class="fas fa-dice"></i>
+            </button>
+        </div>
+        <p class="discover-subtitle" id="discoverMeta">Episode recommendations from your subscribed shows.</p>
+    </header>
+
+    <div class="discover-loading" id="discoverLoading">
+        <div class="loading-spinner">
+            <svg width="28" height="28" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2.5" stroke-dasharray="32" stroke-linecap="round">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+    </div>
+
+    <div class="discover-empty hidden" id="discoverEmpty">
+        <div class="empty-icon">
+            <i class="fas fa-headphones"></i>
+        </div>
+        <h2>No subscribed shows yet</h2>
+        <p>Subscribe to a few NTS shows and Discover will surface episodes for you.</p>
+        <button id="addShowBtn" class="primary-btn">
+            <i class="fas fa-plus"></i>
+            Add Your First Show
+        </button>
+    </div>
+
+    <div class="discover-content hidden" id="discoverContent">
+        <section class="discover-section hidden" id="discoverContinueSection">
+            <h2 class="discover-section__title">Continue listening</h2>
+            <div class="results-list results-list--episodes discover-episode-grid" id="discoverContinue"></div>
+        </section>
+
+        <section class="discover-section hidden" id="discoverBecauseSection">
+            <h2 class="discover-section__title">Because you like</h2>
+            <div class="results-list results-list--episodes discover-episode-grid" id="discoverBecause"></div>
+        </section>
+
+        <section class="discover-section hidden" id="discoverGenreSection">
+            <h2 class="discover-section__title">Genre spotlight</h2>
+            <div class="genre-explorer">
+                <div class="genre-explorer__bar">
+                    <div class="genre-explorer__search">
+                        <i class="fas fa-search genre-explorer__icon"></i>
+                        <input type="text" id="genreExplorerSearch" class="genre-explorer__input" placeholder="Search genres..." autocomplete="off" spellcheck="false">
+                    </div>
+                    <div class="discover-genre-pills" id="discoverGenrePills"></div>
+                </div>
+                <div class="genre-explorer__related hidden" id="genreRelatedPills">
+                    <span class="genre-explorer__related-label">Related</span>
+                </div>
+            </div>
+            <div id="discoverGenres"></div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/nts-audio-player.js') }}?v={{ cache_bust }}" data-page-asset="js/nts-audio-player.js"></script>
+<script src="{{ url_for('static', filename='js/discover-page.js') }}?v={{ cache_bust }}" data-page-asset="js/discover-page.js"></script>
+{% endblock %}

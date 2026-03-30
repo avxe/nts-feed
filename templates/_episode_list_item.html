@@ -1,0 +1,94 @@
+<div id="episode-{{ (episode.url or episode.audio_url).split('/')[-1] }}"
+    class="episode-item {% if episode.is_new %}new{% endif %} {% if episode.is_downloaded %}downloaded{% endif %}">
+    <div class="episode-left-column">
+        {% if episode.image_url %}
+        <div class="episode-thumbnail">
+            <img src="{{ url_for('thumbs.cached_thumbnail') }}?url={{ episode.image_url | urlencode }}"
+                alt="{{ episode.title }}" loading="lazy">
+        </div>
+        {% endif %}
+
+        <div class="episode-download-section">
+            {% if episode.is_downloaded %}
+            <button class="download-button downloaded" disabled>
+                <span class="button-text">Downloaded</span>
+            </button>
+            {% else %}
+            <a href="{{ url_for('downloads.download_episode', url=episode.audio_url) }}" class="download-button">
+                <span class="button-text">Download</span>
+            </a>
+            {% endif %}
+
+            <div class="download-progress">
+                <div class="progress-bar"></div>
+                <div class="progress-info"></div>
+                <button class="cancel-download">Cancel Download</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="episode-info">
+        {% if show_link_url and show_link_title %}
+        <div class="feed-episode-show">
+            <a href="{{ url_for('pages.show', url=show_link_url) }}" class="feed-show-link">{{ show_link_title }}</a>
+        </div>
+        {% endif %}
+        <div class="episode-title-container">
+            <a href="{{ episode_href }}" class="episode-title" target="_blank">{{ episode.title }}</a>
+            {% if episode.is_new %}
+            <span class="new-badge">NEW</span>
+            {% endif %}
+        </div>
+        <span class="episode-date">{{ episode.date }}</span>
+        {% if episode.genres %}
+        <div class="episode-genres">
+            {% for genre in episode.genres %}
+            <span class="genre-tag">{{ genre }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if episode.tracklist %}
+        <div class="episode-tracklist">
+            <div class="tracklist-header">
+                <h3>Tracklist</h3>
+            </div>
+            <ul class="tracks-list">
+                {% for track in episode.tracklist %}
+                <li class="track-item">
+                    <button class="track-info-btn" title="Track info">
+                        <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button class="track-youtube-btn" data-artist="{{ track.artist }}"
+                        data-title="{{ track.name }}">
+                        <span class="loading-spinner"></span>
+                        <svg class="button-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z">
+                            </path>
+                            <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"
+                                fill="currentColor"></polygon>
+                        </svg>
+                    </button>
+                    <button class="track-like-btn" data-artist="{{ track.artist }}"
+                        data-title="{{ track.name }}" title="Like track">
+                        <i class="far fa-heart"></i>
+                    </button>
+                    <span class="track-artist">{{ track.artist }}</span>
+                    <span class="track-title">{{ track.name }}</span>
+                    {% if track.timestamp %}
+                    <span class="track-timestamp" title="Starts at">{{ track.timestamp }}</span>
+                    {% endif %}
+
+                    <div class="download-progress">
+                        <div class="progress-bar"></div>
+                        <div class="progress-info"></div>
+                        <button class="cancel-download">Cancel Download</button>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>

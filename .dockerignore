@@ -1,0 +1,80 @@
+# =============================================================================
+# .dockerignore - Exclude unnecessary files from Docker build context
+# =============================================================================
+# This dramatically reduces image size and build time by preventing
+# large data directories, dev files, and caches from being copied.
+
+# Data directories (persisted via Docker volumes, not baked into image)
+data/
+downloads/
+episodes/
+thumbnails/
+auto_add_dir/
+music_dir/
+
+# Version control
+.git/
+.gitmodules
+.gitignore
+
+# Python caches and virtual environments
+__pycache__/
+.cache
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# IDE and editor files
+.idea/
+.vscode/
+.cursor/
+*.swp
+*.swo
+*~
+
+# Docker files (don't need to copy themselves)
+.dockerignore
+docker-compose.yml
+
+# Environment and secrets
+.env
+.env.*
+!env.example
+.secrets.baseline
+
+# Documentation (not needed in runtime image)
+docs/
+*.md
+!README.md
+LICENSE
+CONTRIBUTING.md
+SECURITY.md
+
+# Tests (not needed in production image)
+tests/
+.pre-commit-config.yaml
+
+# Config scripts (mounted via volume, not needed in image)
+config/scripts/
+
+# SSL certificates (mounted separately)
+config/nginx/ssl/
+
+# Misc
+*.sh
+!docker-entrypoint.sh
+diagnose_shows.sh
+.docker/
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -1,0 +1,407 @@
+/* ====================================
+   Buttons and Controls
+======================================= */
+
+/* Base Button Styles */
+.download-button,
+.subscribe-form button,
+.download-all-button,
+.stop-all-button,
+.cancel-download,
+.mark-read-button,
+.update-form button,
+.back-link,
+.action-btn {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: var(--spacing-base);
+    padding: calc(var(--spacing-base) * 1.5) calc(var(--spacing-base) * 2);
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-family: inherit;
+    font-size: 0.9em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    background: var(--color-surface-alt);
+    color: var(--color-text-primary);
+    /* Cross-browser resets */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    text-decoration: none;
+    line-height: 1.4;
+    box-sizing: border-box;
+}
+
+.download-button:hover,
+.subscribe-form button:hover,
+.download-all-button:hover,
+.stop-all-button:hover,
+.mark-read-button:hover,
+.cancel-download:hover,
+.back-link:hover,
+.update-form button:hover,
+.action-btn:hover {
+    filter: brightness(90%);
+}
+
+/* Disabled/Loading States */
+.download-button.loading,
+.subscribe-form.loading button,
+.download-all-button:disabled,
+.mark-read-button:disabled,
+.action-btn.loading,
+.action-btn:disabled {
+    pointer-events: none;
+    opacity: 0.6;
+    color: var(--color-text-secondary);
+}
+
+/* Auto-download active state */
+.download-all-button.active:not(#autoDownloadButton) {
+    background: var(--color-primary, #4CAF50);
+    color: white;
+}
+
+/* Auto-download button specific styling */
+#autoDownloadButton.active {
+    color: var(--color-text-primary);
+    background: var(--color-surface-alt);
+}
+
+/* Dark Mode Button Adjustments */
+[data-theme="dark"] .download-button,
+[data-theme="dark"] .download-all-button,
+[data-theme="dark"] .stop-all-button,
+[data-theme="dark"] .mark-read-button,
+[data-theme="dark"] .update-form button {
+    color: var(--color-dark-text-primary);
+}
+
+/* Downloaded State */
+.download-button.downloaded {
+    cursor: default;
+    opacity: 0.5;
+}
+
+.download-button.downloaded:hover {
+    filter: none;
+}
+
+.download-button.downloaded::before {
+    content: '✓';
+    color: var(--color-text-primary);
+}
+
+/* Back Link */
+.back-link {
+    margin-right: 0;
+    width: 60px;
+}
+
+.back-link::before {
+    content: '←';
+}
+
+.back-link {
+    margin-right: auto; 
+    width: 60px;
+}
+
+/* Floating state for back link when page is scrolled */
+.back-link.floating {
+    position: fixed;
+    top: calc(var(--spacing-base) * 2);
+    left: calc(var(--spacing-base) * 2);
+    z-index: 1101;
+    box-shadow: 0 2px 8px var(--color-shadow);
+    background: var(--color-surface);
+}
+
+/* Delete Button */
+.delete-form {
+    display: flex;
+    align-items: center;
+}
+
+.delete-button {
+    background: none;
+    border: none;
+    color: var(--color-text-tertiary);
+    padding: var(--spacing-base);
+    cursor: pointer;
+    transition: color var(--transition-base);
+    font-size: 1.1em;
+}
+
+.delete-button:hover {
+    color: var(--color-text-secondary);
+}
+
+/* Download Button */
+.download-button {
+    height: fit-content;
+    justify-content: center;
+    position: relative;
+}
+
+.download-button::before {
+    content: '↓';
+}
+
+.download-button.loading {
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+.download-button.loading .loading-spinner {
+    display: block;
+}
+
+/* Generic action button spinner handling */
+.action-btn .loading-spinner { display: none; }
+.action-btn.loading .loading-spinner { display: inline-block; }
+
+.download-button.error {
+    background: var(--color-error);
+    color: var(--color-dark-text-primary);
+}
+
+/* Cancel Download Button */
+.cancel-download {
+    display: none;
+    margin-top: 20px;
+    font-size: 0.8em;
+}
+
+.cancel-download:hover {
+    color: var(--color-text-secondary);
+}
+
+/* Show cancel button when progress is visible */
+.download-progress[style*="display: block"] .cancel-download {
+    display: block;
+}
+
+/* Show cancel button when download is in progress */
+.episode-item .download-progress:not([style*="display: none"]) + .cancel-download {
+    display: block;
+}
+
+/* Update Form Button */
+.update-form button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: calc(var(--spacing-base) * 0.75);
+    padding: calc(var(--spacing-base) * 1) calc(var(--spacing-base) * 1.5);
+    border-radius: var(--border-radius-md);
+    position: relative;
+    white-space: nowrap;
+}
+
+.update-form button .button-text {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing-base) * 0.75);
+}
+
+.update-form button .button-label {
+    font-size: 0.9em;
+    font-weight: 500;
+}
+
+.update-form button .loading-spinner {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Show page specific update button */
+.header-container .update-form {
+    margin-left: 0;
+    margin-right: 10px;
+}
+
+.header-container .update-form button {
+    background: var(--color-surface-alt);
+}
+
+/* ====================================
+   Unified Icon Button (.btn-icon)
+   32x32px circular buttons for actions
+======================================= */
+
+.btn-icon {
+    display: -webkit-inline-flex;
+    display: inline-flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    width: var(--btn-icon-size);
+    height: var(--btn-icon-size);
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--btn-icon-radius);
+    background: var(--color-surface);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+    /* Cross-browser resets */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    line-height: 1;
+}
+
+.btn-icon:hover {
+    background: var(--color-surface-alt);
+    color: var(--color-text-primary);
+    transform: scale(1.05);
+}
+
+.btn-icon:active {
+    transform: scale(0.95);
+}
+
+.btn-icon:disabled,
+.btn-icon.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Small variant */
+.btn-icon--sm {
+    width: var(--btn-icon-size-sm);
+    height: var(--btn-icon-size-sm);
+}
+
+/* YouTube variant */
+.btn-icon--youtube:hover {
+    background: rgba(255, 0, 0, 0.1);
+    color: #ff0000;
+    border-color: rgba(255, 0, 0, 0.3);
+}
+
+/* Play variant */
+.btn-icon--play:hover {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: white;
+}
+
+/* Loading state */
+.btn-icon.loading,
+.btn-icon.searching {
+    pointer-events: none;
+}
+
+.btn-icon .loading-spinner {
+    display: none;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-text-primary);
+    border-radius: 50%;
+    animation: btn-icon-spin 0.8s linear infinite;
+}
+
+.btn-icon.loading .loading-spinner,
+.btn-icon.searching .loading-spinner {
+    display: block;
+}
+
+.btn-icon.loading .button-icon,
+.btn-icon.searching .button-icon,
+.btn-icon.loading i:not(.loading-spinner),
+.btn-icon.searching i:not(.loading-spinner) {
+    display: none;
+}
+
+@keyframes btn-icon-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+    .btn-icon {
+        background: var(--color-dark-surface);
+        border-color: var(--color-dark-border);
+        color: var(--color-dark-text-secondary);
+    }
+    
+    .btn-icon:hover {
+        background: var(--color-dark-surface-alt);
+        color: var(--color-dark-text-primary);
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    /* Inherits base button colors, just ensuring consistency if needed */
+}
+
+/* ====================================
+   Episode Like Button (.episode-like-btn)
+======================================= */
+
+.episode-like-btn {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    -webkit-flex-shrink: 0;
+    flex-shrink: 0;
+    /* Cross-browser resets */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    line-height: 1;
+}
+
+.episode-like-btn:hover {
+    background: var(--color-surface);
+    color: var(--color-error, #e74c3c);
+    border-color: var(--color-error, #e74c3c);
+}
+
+.episode-like-btn.liked {
+    color: var(--color-error, #e74c3c);
+    border-color: var(--color-error, #e74c3c);
+}
+
+.episode-like-btn.liked i {
+    animation: heartPop 0.3s ease;
+}
+
+.episode-like-btn.processing {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+@keyframes heartPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+} 

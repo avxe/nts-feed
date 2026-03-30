@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.6
+    hooks:
+      - id: ruff
+      - id: ruff-format
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: |
+          (?x)^( 
+            data/|
+            downloads/|
+            venv/|
+            cache/
+          )

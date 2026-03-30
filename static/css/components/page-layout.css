@@ -1,0 +1,144 @@
+/* ====================================
+   Unified Page Layout Components
+   Provides consistent structure across all pages
+======================================= */
+
+/* Page Header - top section with title and primary actions */
+.page-header {
+    margin-bottom: var(--space-md);
+    box-sizing: border-box;
+}
+
+.page-title-row {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    gap: var(--space-md);
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    box-sizing: border-box;
+}
+
+.page-title {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    line-height: 1.3;
+}
+
+.page-title i {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+/* Primary actions in page header */
+.page-actions {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: 10px;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+/* Controls bar - filters, sorting, search below header */
+.page-controls {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
+
+/* Download buttons in page-actions - keep inline */
+.page-actions .download-buttons {
+    display: -webkit-flex;
+    display: flex;
+    gap: var(--space-sm);
+}
+
+/* Secondary controls row within page header */
+.page-header-controls {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: var(--space-md);
+    margin-top: var(--space-sm);
+}
+
+/* Page content wrapper - for page-specific layouts */
+.page-content {
+    /* Base styles, page-specific layouts override as needed */
+}
+
+/* ====================================
+   Page-specific icon colors
+======================================= */
+
+/* Likes page - heart icon in red */
+.page-title .fa-heart {
+    color: var(--color-error, #e74c3c);
+}
+
+/* Stats page - table icon */
+.page-title .fa-table {
+    color: var(--color-text-secondary);
+}
+
+/* Mixtape page - vinyl icon */
+.page-title .fa-record-vinyl {
+    color: var(--color-text-secondary);
+}
+
+/* ====================================
+   Responsive adjustments
+======================================= */
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-title i {
+        font-size: 1.25rem;
+    }
+    
+    .page-title-row {
+        gap: var(--space-sm);
+    }
+    
+    .page-actions {
+        width: 100%;
+    }
+    
+    .page-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-title {
+        font-size: 1.25rem;
+    }
+    
+    .page-actions .action-btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+

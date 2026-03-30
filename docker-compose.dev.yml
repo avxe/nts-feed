@@ -1,0 +1,16 @@
+# Tracked development overlay for explicit local dev runs.
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  web:
+    volumes:
+      - .:/app
+      - ./downloads:/app/downloads
+      - ./config:/config
+      - ./data:/app/data
+      - "${AUTO_ADD_DIR_HOST:-./auto_add_dir}:/app/auto_add_dir"
+      - "${MUSIC_DIR_HOST:-./music_dir}:/app/music_dir"
+    environment:
+      - FLASK_DEBUG=1
+      - PYTHONUNBUFFERED=1
+      - WATCHDOG_USE_POLLING=true

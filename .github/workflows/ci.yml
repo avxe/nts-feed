@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install lint tooling
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+
+      - name: Run ruff
+        run: ruff check .
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install detect-secrets
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install detect-secrets==1.5.0
+
+      - name: Check tracked files for secrets
+        run: detect-secrets-hook --baseline .secrets.baseline $(git ls-files)
+
+  test-python:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e .[dev]
+
+      - name: Run Python tests
+        env:
+          SECRET_KEY: ci-test-secret-key # pragma: allowlist secret
+          ENABLE_TALISMAN: "true"
+          FORCE_HTTPS: "false"
+        run: python -m pytest tests/ -q
+
+  test-js:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run frontend tests
+        run: node --test tests/js/*.mjs
+
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Build distributions
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install build
+          python -m build --sdist --wheel
+
+      - name: Install built wheel in clean venv
+        run: |
+          python -m venv /tmp/nts-feed-wheel
+          /tmp/nts-feed-wheel/bin/pip install --upgrade pip
+          /tmp/nts-feed-wheel/bin/pip install dist/*.whl
+          /tmp/nts-feed-wheel/bin/python -c "import nts_feed; print(nts_feed.__version__)"
+          /tmp/nts-feed-wheel/bin/nts-feed --help
+          /tmp/nts-feed-wheel/bin/build-database --help
+          /tmp/nts-feed-wheel/bin/backfill-tracklists --help
+          /tmp/nts-feed-wheel/bin/backfill-auto-downloads --help
+          /tmp/nts-feed-wheel/bin/recover-shows --help

@@ -1,0 +1,536 @@
+/* ==========================================================================
+   Discover Page Styles
+   ========================================================================== */
+
+.discover-container {
+  max-width: var(--content-max-width);
+  padding-top: var(--space-lg);
+  padding-bottom: calc(var(--space-xl) + var(--space-lg));
+}
+
+/* --- Header --------------------------------------------------------------- */
+
+.discover-header {
+  margin-bottom: var(--space-lg);
+}
+
+.discover-header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.discover-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+.discover-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* --- Surprise Button ------------------------------------------------------ */
+
+.surprise-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: color var(--transition-base), border-color var(--transition-base), background var(--transition-base);
+}
+
+.surprise-btn:hover {
+  color: var(--color-text-primary);
+  border-color: var(--color-text-tertiary);
+}
+
+.surprise-btn:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.surprise-btn.spinning i {
+  animation: discover-spin 0.8s linear infinite;
+}
+
+@keyframes discover-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Loading -------------------------------------------------------------- */
+
+.discover-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) 0;
+  color: var(--color-text-tertiary);
+}
+
+/* --- Empty State ---------------------------------------------------------- */
+
+.discover-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  min-height: 240px;
+  padding: var(--space-xl);
+  text-align: center;
+}
+
+.discover-empty .empty-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-surface-alt);
+  color: var(--color-text-tertiary);
+  font-size: 1.5rem;
+}
+
+.discover-empty h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.discover-empty p {
+  max-width: 32rem;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 0.6rem 1rem;
+  border: none;
+  border-radius: var(--border-radius-md);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--transition-base);
+}
+
+.primary-btn:hover {
+  opacity: 0.85;
+}
+
+/* --- Content Area --------------------------------------------------------- */
+
+.discover-content {
+  display: block;
+}
+
+/* --- Sections ------------------------------------------------------------- */
+
+.discover-section {
+  margin-bottom: var(--space-lg);
+}
+
+.discover-section__title {
+  margin: 0 0 var(--space-sm) 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+}
+
+/* --- Genre Explorer ------------------------------------------------------- */
+
+.genre-explorer {
+  margin-bottom: var(--space-sm);
+}
+
+.genre-explorer__bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+  scrollbar-width: none;
+}
+
+.genre-explorer__bar::-webkit-scrollbar {
+  display: none;
+}
+
+.genre-explorer__search {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  background: var(--color-surface);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.genre-explorer__search:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-primary) 15%, transparent);
+}
+
+.genre-explorer__icon {
+  font-size: 0.65rem;
+  color: var(--color-text-tertiary);
+  flex-shrink: 0;
+}
+
+.genre-explorer__input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  width: 100px;
+  min-width: 0;
+  padding: 1px 0;
+  font-family: inherit;
+}
+
+.genre-explorer__input::placeholder {
+  color: var(--color-text-tertiary);
+  font-weight: 400;
+}
+
+/* --- Genre Pill Bar ------------------------------------------------------- */
+
+.discover-genre-pills {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.discover-genre-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.discover-genre-pill {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 100px;
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base), opacity 0.15s ease;
+  animation: genrePillAppear 0.2s ease-out both;
+}
+
+.discover-genre-pill:hover {
+  border-color: var(--color-text-tertiary);
+  color: var(--color-text-primary);
+}
+
+.discover-genre-pill.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+.genre-pill__count {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+.discover-genre-pill.active .genre-pill__count {
+  opacity: 0.8;
+}
+
+/* --- Related Genre Pills -------------------------------------------------- */
+
+.genre-explorer__related {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  margin-bottom: var(--space-sm);
+  scrollbar-width: none;
+  animation: genreRelatedSlideIn 0.25s ease-out both;
+}
+
+.genre-explorer__related::-webkit-scrollbar {
+  display: none;
+}
+
+.genre-explorer__related-label {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: var(--color-text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-right: 2px;
+}
+
+.genre-related-pill {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border: 1px dashed var(--color-border);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--color-text-tertiary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transition-base), color var(--transition-base), border-color var(--transition-base);
+  animation: genrePillAppear 0.2s ease-out both;
+}
+
+.genre-related-pill:hover {
+  border-style: solid;
+  border-color: var(--color-text-tertiary);
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+}
+
+/* --- Explorer States ------------------------------------------------------ */
+
+.genre-explorer__no-results {
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  padding: 4px 0;
+}
+
+.genre-explorer__loading {
+  font-size: 0.8rem;
+  color: var(--color-text-tertiary);
+  padding: var(--space-md) 0;
+}
+
+/* --- Animations ----------------------------------------------------------- */
+
+@keyframes genrePillAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes genreRelatedSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* --- Discover: poster grid (big thumbnails) ------------------------------ */
+
+.discover-container .discover-episode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: var(--space-md);
+  align-items: stretch;
+}
+
+.discover-container .discover-episode-card.discover-episode-card--tile.search-episode-card {
+  text-decoration: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    background var(--transition-base);
+}
+
+.discover-container .discover-episode-card--tile.search-episode-card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 4px 14px var(--color-shadow),
+    0 1px 2px var(--color-shadow);
+}
+
+/* Thumbnail + play overlay (matches show page .episode-thumbnail) */
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  display: block;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-transform);
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+  z-index: 1;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play::before {
+  content: '\f04b';
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+  color: white;
+  font-size: 2rem;
+  z-index: 2;
+  opacity: 0;
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-transform);
+  pointer-events: none;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:hover::after,
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:focus-visible::after {
+  opacity: 1;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:hover::before,
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:focus-visible::before {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:focus {
+  outline: none;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-thumb-play:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-card__body {
+  flex: 1;
+  min-width: 0;
+  padding: var(--space-sm) var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-card__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  text-decoration: none;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-card__title:hover {
+  color: var(--color-text-secondary);
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-meta-line {
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-meta-sep {
+  margin: 0 0.3em;
+  opacity: 0.75;
+}
+
+.discover-container .discover-episode-card--tile .discover-episode-reason {
+  color: var(--color-text-secondary);
+}
+
+/* --- Responsive ----------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .discover-container {
+    padding-top: var(--space-md);
+  }
+
+  .discover-title {
+    font-size: 1.25rem;
+  }
+
+  .discover-empty {
+    min-height: 200px;
+    padding: var(--space-lg);
+  }
+
+  .genre-explorer__bar {
+    flex-wrap: wrap;
+  }
+
+  .genre-explorer__input {
+    width: 80px;
+  }
+}

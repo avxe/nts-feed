@@ -1,0 +1,214 @@
+/* ====================================
+   Unified Chips and Tags
+   Consistent pill-shaped badges
+======================================= */
+
+/* Base Chip - used in stats, mixtape, etc. */
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--border-radius-full);
+    background: var(--color-surface-alt);
+    color: var(--color-text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: all var(--transition-base);
+}
+
+.chip:hover {
+    filter: brightness(95%);
+}
+
+/* Chip with border variant */
+.chip--outlined {
+    background: transparent;
+    border: 1px solid var(--color-border);
+}
+
+.chip--outlined:hover {
+    background: var(--color-surface-alt);
+}
+
+/* Chip with remove button */
+.chip .chip-remove {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin-left: var(--space-xs);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.08);
+    color: inherit;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 0.7em;
+}
+
+.chip .chip-remove:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* Active/Selected chip state */
+.chip.active,
+.chip.selected {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.chip.active:hover,
+.chip.selected:hover {
+    filter: brightness(90%);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .chip {
+        background: var(--color-dark-surface-alt);
+        color: var(--color-dark-text-secondary);
+    }
+    
+    .chip--outlined {
+        background: transparent;
+        border-color: var(--color-dark-border);
+    }
+    
+    .chip .chip-remove {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .chip .chip-remove:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+}
+
+/* ====================================
+   Genre Tag - clickable genre pills
+======================================= */
+
+.genre-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) calc(var(--space-sm) * 1.5);
+    border-radius: var(--border-radius-full);
+    background: var(--color-surface-alt);
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+    line-height: 1.2;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+}
+
+.genre-tag:hover {
+    background: var(--color-border);
+    color: var(--color-text-primary);
+}
+
+.genre-tag:active {
+    transform: scale(0.98);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .genre-tag {
+        background: var(--color-dark-surface-alt);
+        color: var(--color-dark-text-secondary);
+    }
+    
+    .genre-tag:hover {
+        background: var(--color-dark-border);
+        color: var(--color-dark-text-primary);
+    }
+}
+
+/* ====================================
+   Genre Pill - for mixtape genre selection
+======================================= */
+
+.genre-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) calc(var(--space-sm) * 1.5);
+    border-radius: var(--border-radius-full);
+    background: var(--color-surface-alt);
+    color: var(--color-text-secondary);
+    font-size: 0.9em;
+    line-height: 1.2;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    user-select: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.genre-pill:hover {
+    background: var(--color-border);
+    transform: scale(1.02);
+}
+
+.genre-pill:focus-visible {
+    outline: 2px solid var(--color-border);
+    outline-offset: 2px;
+}
+
+.genre-pill.selected,
+.genre-pill.active {
+    background: var(--color-primary);
+    color: #fff;
+}
+
+.genre-pill.hidden {
+    display: none;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .genre-pill {
+        background: var(--color-dark-surface-alt);
+        color: var(--color-dark-text-secondary);
+    }
+    
+    .genre-pill:hover {
+        background: var(--color-dark-border);
+    }
+}
+
+/* ====================================
+   Badge - small status indicators
+======================================= */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: var(--border-radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.badge--new {
+    border: 1px solid var(--color-text-secondary);
+    color: var(--color-text-secondary);
+}
+
+.badge--auto {
+    border: 1px solid var(--color-text-secondary);
+    color: var(--color-text-secondary);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .badge--new {
+        color: var(--color-dark-text-primary);
+    }
+}
+

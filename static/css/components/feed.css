@@ -1,0 +1,92 @@
+/* ====================================
+   Episode Feed (Homepage)
+======================================= */
+
+.feed-header {
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.feed-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-xs);
+    letter-spacing: -0.02em;
+}
+
+.feed-subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Show link above episode title in feed */
+.feed-episode-show {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+}
+
+.feed-show-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    transition: color var(--transition-base);
+}
+
+.feed-show-link:hover {
+    color: var(--color-text-primary);
+}
+
+/* Empty State */
+.feed-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-xl) var(--space-lg);
+    text-align: center;
+    color: var(--color-text-secondary);
+    min-height: 300px;
+}
+
+.feed-empty-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.4;
+}
+
+.feed-empty h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0 0 var(--space-sm);
+}
+
+.feed-empty p {
+    margin: 0 0 var(--space-lg);
+    max-width: 280px;
+}
+
+.feed-subscribe-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.feed-subscribe-btn:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}

@@ -1,0 +1,349 @@
+/* ====================================
+   Responsive Design
+======================================= */
+
+/* Responsive Design for Sorting Controls */
+@media (max-width: 768px) {
+    .controls-container {
+        flex-direction: column;
+        gap: calc(var(--spacing-base) * 1.5);
+        align-items: stretch;
+    }
+    
+    .sorting-controls {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .sort-dropdown {
+        min-width: 140px;
+        flex: 1;
+        font-size: 0.85em;
+        padding: calc(var(--spacing-base) * 1.25) calc(var(--spacing-base) * 1.5);
+        padding-right: calc(var(--spacing-base) * 4);
+    }
+    
+    .show-stats {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .last-updated {
+        margin-left: 0;
+    }
+}
+
+/* Responsive Design for Episodes */
+@media (max-width: 768px) {
+    .episode-item {
+        grid-template-columns: 1fr !important;
+        gap: calc(var(--spacing-base) * 2);
+    }
+
+    .episode-left-column {
+        order: -1;
+    }
+
+    .episode-thumbnail {
+        aspect-ratio: 16/9;
+    }
+
+    .episode-download-section {
+        flex-direction: row;
+        align-items: center;
+        gap: calc(var(--spacing-base) * 2);
+    }
+
+    .download-button {
+        width: auto;
+        min-width: 120px;
+    }
+
+    .episode-info {
+        padding-top: 0;
+    }
+
+    .top-controls {
+        flex-wrap: wrap;
+        gap: calc(var(--spacing-base) * 2);
+    }
+    
+    .top-controls .download-buttons {
+        order: 3;
+        width: 100%;
+        margin-top: calc(var(--spacing-base) * 1);
+    }
+    
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: calc(var(--spacing-base) * 2);
+    }
+    
+    .controls {
+        width: 100%;
+        margin-top: calc(var(--spacing-base) * 2);
+    }
+    
+    .search-container {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .episode-item {
+        padding: calc(var(--spacing-base) * 2);
+    }
+
+    .episode-download-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .download-button {
+        width: 100%;
+    }
+
+    .episode-title {
+        font-size: 1.1em;
+    }
+
+    .episode-date,
+    .episode-genres {
+        font-size: 0.8em;
+    }
+    .show-item {
+        grid-template-columns: 1fr;
+        padding: calc(var(--spacing-base) * 2);
+        height: auto;
+    }
+
+    .show-right-section {
+        position: absolute;
+        top: calc(var(--spacing-base) * 2);
+        right: calc(var(--spacing-base) * 2);
+    }
+
+    .show-right-section .last-updated {
+        display: none;
+    }
+
+    .show-thumbnail-container {
+        width: 100%;
+        aspect-ratio: 16/9;
+    }
+
+    .show-details {
+        padding-top: var(--spacing-base);
+    }
+
+    #autoDownloadButton {
+        font-size: 0.8em;
+        padding: calc(var(--spacing-base) * 1.2);
+    }
+}
+
+/* General Responsive Design */
+@media (max-width: 1024px) {
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: calc(var(--spacing-base) * 2);
+    }
+
+    .title-container {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .form-container {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: calc(var(--spacing-base) * 2);
+    }
+
+    .show-content,
+    .episode-item {
+        grid-template-columns: 1fr;
+    }
+
+    .show-thumbnail-container,
+    .episode-thumbnail {
+        aspect-ratio: 16/9;
+        width: 100%;
+    }
+
+    .subscribe-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .episode-info {
+        padding: calc(var(--spacing-base) * 1) 0;
+    }
+
+    .episode-title {
+        font-size: 1.2em;
+    }
+
+    .episode-date,
+    .episode-genres {
+        font-size: 0.85em;
+    }
+
+    .track-item {
+        font-size: 0.85em;
+    }
+
+    .top-controls {
+        flex-wrap: wrap;
+        gap: calc(var(--spacing-base) * 2);
+    }
+    
+    .top-controls .download-buttons {
+        order: 3;
+        width: 100%;
+        margin-top: calc(var(--spacing-base) * 1);
+    }
+    
+    .header-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: calc(var(--spacing-base) * 2);
+    }
+    
+    .controls {
+        width: 100%;
+        margin-top: calc(var(--spacing-base) * 2);
+    }
+    
+    .search-container {
+        flex: 1 1 auto;
+        width: 100%;
+        min-width: 100%;
+        max-width: 100%;
+    }
+    
+    .back-link {
+        order: 1;
+    }
+    
+    .download-buttons {
+        order: 2;
+        margin-left: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: var(--space-sm);
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .back-link {
+        width: auto;
+        padding: calc(var(--spacing-base) * 1) calc(var(--spacing-base) * 1.5);
+    }
+
+    .download-button,
+    .subscribe-form button,
+    .download-all-button,
+    .stop-all-button,
+    .cancel-download,
+    .mark-read-button,
+    .update-form button {
+        padding: calc(var(--spacing-base) * 1) calc(var(--spacing-base) * 1.5);
+        font-size: 0.8em;
+    }
+
+    /* Hide update button label on mobile, show icon only */
+    .update-form button .button-label {
+        display: none;
+    }
+
+    .episode-title {
+        font-size: 1em;
+    }
+
+    .episode-date,
+    .episode-genres {
+        font-size: 0.75em;
+    }
+
+    .track-item {
+        font-size: 0.75em;
+    }
+
+    #autoDownloadButton {
+        font-size: 0.8em;
+        padding: calc(var(--spacing-base) * 1.2);
+    }
+}
+
+/* YouTube Player Responsive */
+@media (max-width: 768px) {
+    .youtube-player-info {
+        max-width: 15%;
+        width: 15%;
+    }
+    
+    .youtube-player-volume-slider-container {
+        width: 60px;
+    }
+    
+    .youtube-player-volume-slider {
+        width: 100%;
+    }
+    
+    .youtube-player-center-controls {
+        width: 70%;
+    }
+    
+    .youtube-player-controls {
+        width: 15%;
+    }
+}
+
+@media (max-width: 480px) {
+    .youtube-player-volume-container {
+        display: none;
+    }
+    
+    .youtube-player-info {
+        max-width: 25%;
+        width: 25%;
+    }
+    
+    .youtube-player-thumbnail {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .youtube-player-center-controls {
+        width: 50%;
+    }
+    
+    .youtube-player-controls {
+        width: 25%;
+        gap: 8px;
+    }
+    
+    .youtube-player-controls button {
+        padding: 6px;
+    }
+    
+    .youtube-player-time {
+        font-size: 0.8rem;
+    }
+} 

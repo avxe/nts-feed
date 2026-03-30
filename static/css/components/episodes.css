@@ -1,0 +1,214 @@
+/* ====================================
+   Episode List
+======================================= */
+
+.episodes-list {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: calc(var(--spacing-base) * 3);
+}
+
+/* Episode Item Base Styles */
+.episode-item {
+    display: -ms-grid;
+    display: grid;
+    grid-template-columns: minmax(264px, 25%) 1fr auto;
+    gap: calc(var(--spacing-base) * 6);
+    padding: calc(var(--spacing-base) * 3);
+    background: var(--color-surface);
+    border-radius: var(--border-radius-xl);
+    box-shadow: 0 1px 2px var(--color-shadow),
+                0 2px 4px var(--color-shadow);
+    position: relative;
+    overflow: visible;
+    transition: all var(--transition-base);
+    box-sizing: border-box;
+}
+
+.episode-left-column {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: calc(var(--spacing-base) * 2);
+    box-sizing: border-box;
+}
+
+.episode-item.downloaded {
+    opacity: 0.8;
+}
+
+/* Episode Thumbnail */
+.episode-thumbnail {
+    position: relative;
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    width: 100%;
+    aspect-ratio: 1;
+}
+
+.episode-item:has(.episode-tracklist) .episode-thumbnail {
+    cursor: pointer;
+}
+
+.episode-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-transform);
+}
+
+/* Play button overlay */
+.episode-item:has(.episode-tracklist) .episode-thumbnail::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.episode-item:has(.episode-tracklist) .episode-thumbnail::before {
+    content: '\f04b';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    color: white;
+    font-size: 2rem;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity var(--transition-base), transform var(--transition-transform);
+}
+
+.episode-item:has(.episode-tracklist) .episode-thumbnail:hover::after {
+    opacity: 1;
+}
+
+.episode-item:has(.episode-tracklist) .episode-thumbnail:hover::before {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/*
+   Search results (index page) overrides
+   Keep show page styling intact by scoping to #searchEpisodesContainer
+*/
+#searchEpisodesContainer.episodes-list {
+    gap: calc(var(--spacing-base) * 3);
+}
+#searchEpisodesContainer.tracks-list {
+    margin-left:0;
+}
+
+#searchEpisodesContainer .episode-item {
+    grid-template-columns: minmax(140px, 140px) 1fr;
+    gap: calc(var(--spacing-base) * 4);
+    margin-bottom: 12px;
+    padding: calc(var(--spacing-base) * 2);
+}
+
+#searchEpisodesContainer .episode-thumbnail {
+    width: 140px;
+    height: 140px;
+    aspect-ratio: auto;
+}
+
+/* Remove play overlay; use simple zoom on hover */
+#searchEpisodesContainer .episode-thumbnail::before,
+#searchEpisodesContainer .episode-thumbnail::after {
+    display: none !important;
+    content: none !important;
+}
+
+#searchEpisodesContainer .episode-thumbnail:hover img {
+    transform: scale(1.06);
+}
+
+/* Remove negative left margin only for search results list */
+#searchEpisodesContainer .tracks-list {
+    margin-left: 0 !important;
+}
+
+.episode-download-section {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: row;
+    flex-direction: row;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: var(--spacing-base);
+    -webkit-align-items: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.episode-download-section .download-button {
+    flex: 1;
+    min-width: 0;
+    justify-content: center;
+}
+
+/* Episode Info */
+.episode-info {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    gap: calc(var(--spacing-base) * 1.5);
+    padding: calc(var(--spacing-base) * 0.5) 0;
+    box-sizing: border-box;
+}
+
+.episode-title-container {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-align-items: center;
+    align-items: center;
+    gap: calc(var(--spacing-base) * 2);
+}
+
+.episode-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    line-height: 1.3;
+    transition: color var(--transition-base);
+}
+
+.episode-title:hover {
+    color: var(--color-text-secondary);
+}
+
+@media (prefers-color-scheme: dark) {
+  .episode-title:hover {
+    color: var(--color-dark-text-secondary);
+  }
+}
+
+.episode-date {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.episode-genres {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+    gap: var(--spacing-base);
+}
+
+/* .genre-tag is now defined in chips.css */ 

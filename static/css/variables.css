@@ -1,0 +1,118 @@
+/* ====================================
+   Design System - CSS Custom Properties
+======================================= */
+
+:root {
+    /* Primary Brand Colors */
+    --color-primary: #121212;
+    --color-primary-dark: #444444;
+    --color-primary-rgb: 18, 18, 18;
+    --color-primary-dark-rgb: 68, 68, 68;
+    
+    /* Background Colors */
+    --color-background: #f5f5f5;
+    --color-surface: #ffffff;
+    --color-surface-alt: #f0f0f0;
+    --color-background-rgb: 245, 245, 245;
+    --color-surface-rgb: 255, 255, 255;
+    --color-surface-alt-rgb: 240, 240, 240;
+    
+    /* Text Colors */
+    --color-text-primary: #1a1a1a;
+    --color-text-secondary: #666666;
+    --color-text-tertiary: #999999;
+    --color-text-primary-rgb: 26, 26, 26;
+    --color-text-secondary-rgb: 102, 102, 102;
+    --color-text-tertiary-rgb: 153, 153, 153;
+    
+    /* Border Colors */
+    --color-border: #e0e0e0;
+    --color-border-dark: #333333;
+    --color-border-rgb: 224, 224, 224;
+    --color-border-dark-rgb: 51, 51, 51;
+    
+    /* Shadow Colors */
+    --color-shadow: rgba(0, 0, 0, 0.04);
+    --color-shadow-dark: rgba(0, 0, 0, 0.2);
+    
+    /* Semantic Colors */
+    --color-success: #4caf50;
+    --color-error: #f44336;
+    --color-info: #3498db;
+    --color-disabled: #cccccc;
+    --color-success-rgb: 76, 175, 80;
+    --color-error-rgb: 244, 67, 54;
+    --color-info-rgb: 52, 152, 219;
+    --color-disabled-rgb: 204, 204, 204;
+    
+    /* Dark Mode Colors */
+    --color-dark-background: #121212;
+    --color-dark-surface: #1a1a1a;
+    --color-dark-surface-alt: #242424;
+    --color-dark-text-primary: #ffffff;
+    --color-dark-text-secondary: #b0b0b0;
+    --color-dark-border: #444444;
+    --color-dark-background-rgb: 18, 18, 18;
+    --color-dark-surface-rgb: 26, 26, 26;
+    --color-dark-surface-alt-rgb: 36, 36, 36;
+    --color-dark-text-primary-rgb: 255, 255, 255;
+    --color-dark-text-secondary-rgb: 176, 176, 176;
+    
+    /* Layout Values */
+    --border-radius-sm: 4px;
+    --border-radius-md: 8px;
+    --border-radius-lg: 12px;
+    --border-radius-xl: 16px;
+    --border-radius-full: 9999px;
+    --spacing-base: 8px;
+    
+    /* Unified Spacing Scale */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    
+    /* Unified Layout */
+    --content-max-width: 1200px;
+    --container-padding: var(--space-lg);
+    --page-padding: var(--space-md);
+    
+    /* Icon Button Standards */
+    --btn-icon-size: 32px;
+    --btn-icon-size-sm: 24px;
+    --btn-icon-radius: 50%;
+    
+    /* Form Control Standards */
+    --form-control-height: 43px;
+    --form-control-padding: 10px 12px;
+    --form-control-border: 2px solid var(--color-border);
+    --form-control-radius: var(--border-radius-lg);
+    
+    /* Transitions */
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+    --transition-transform: 0.5s ease;
+}
+
+/* ====================================
+   Dark Mode Theme Override
+======================================= */
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-background: var(--color-dark-background);
+        --color-surface: var(--color-dark-surface);
+        --color-surface-alt: var(--color-dark-surface-alt);
+        --color-text-primary: var(--color-dark-text-primary);
+        --color-text-secondary: var(--color-dark-text-secondary);
+        --color-border: var(--color-border-dark);
+        --color-shadow: var(--color-shadow-dark);
+        --color-background-rgb: var(--color-dark-background-rgb);
+        --color-surface-rgb: var(--color-dark-surface-rgb);
+        --color-surface-alt-rgb: var(--color-dark-surface-alt-rgb);
+        --color-text-primary-rgb: var(--color-dark-text-primary-rgb);
+        --color-text-secondary-rgb: var(--color-dark-text-secondary-rgb);
+        --color-border-rgb: var(--color-border-dark-rgb);
+    }
+} 

@@ -1,0 +1,110 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}Search{% if query %}: {{ query }}{% endif %} - NTS Feed{% endblock %}
+
+{% block content %}
+<div class="container search-container" data-search-query="{{ query | e }}" data-search-types="{{ types | e }}">
+    <div class="search-page-header">
+        <div class="search-query-display">
+            <h1 class="search-query-title">
+                {% if query %}
+                Results for <span class="query-text">"{{ query }}"</span>
+                {% else %}
+                Search
+                {% endif %}
+            </h1>
+            <div class="search-meta" id="searchMeta"></div>
+        </div>
+    </div>
+
+    <div class="search-tabs" id="searchTabs">
+        <button class="search-tab active" data-type="all">
+            <span class="tab-label">All</span>
+            <span class="tab-count" id="countAll">0</span>
+        </button>
+        <button class="search-tab" data-type="shows">
+            <i class="fas fa-broadcast-tower"></i>
+            <span class="tab-label">Shows</span>
+            <span class="tab-count" id="countShows">0</span>
+        </button>
+        <button class="search-tab" data-type="episodes">
+            <i class="fas fa-podcast"></i>
+            <span class="tab-label">Episodes</span>
+            <span class="tab-count" id="countEpisodes">0</span>
+        </button>
+        <button class="search-tab" data-type="tracks">
+            <i class="fas fa-music"></i>
+            <span class="tab-label">Tracks</span>
+            <span class="tab-count" id="countTracks">0</span>
+        </button>
+        <button class="search-tab" data-type="artists">
+            <i class="fas fa-user"></i>
+            <span class="tab-label">Artists</span>
+            <span class="tab-count" id="countArtists">0</span>
+        </button>
+        <button class="search-tab" data-type="genres">
+            <i class="fas fa-tags"></i>
+            <span class="tab-label">Genres</span>
+            <span class="tab-count" id="countGenres">0</span>
+        </button>
+    </div>
+
+    <div class="search-loading" id="searchLoading">
+        <div class="loading-spinner">
+            <svg width="32" height="32" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="32" stroke-linecap="round">
+                    <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                </circle>
+            </svg>
+        </div>
+        <p>Searching your library...</p>
+    </div>
+
+    <div class="search-empty hidden" id="searchEmpty">
+        <i class="fas fa-search"></i>
+        <h3>No results found</h3>
+        <p>Try a show name, artist, track, episode title, or genre.</p>
+    </div>
+
+    <div class="search-results hidden" id="searchResults">
+        <section class="results-section hidden" id="sectionShows">
+            <div class="section-header">
+                <h2><i class="fas fa-broadcast-tower"></i> Shows</h2>
+            </div>
+            <div class="results-grid results-grid--shows" id="resultsShows"></div>
+        </section>
+
+        <section class="results-section hidden" id="sectionEpisodes">
+            <div class="section-header">
+                <h2><i class="fas fa-podcast"></i> Episodes</h2>
+            </div>
+            <div class="results-list results-list--episodes" id="resultsEpisodes"></div>
+        </section>
+
+        <section class="results-section hidden" id="sectionTracks">
+            <div class="section-header">
+                <h2><i class="fas fa-music"></i> Tracks</h2>
+            </div>
+            <div class="results-list results-list--tracks" id="resultsTracks"></div>
+        </section>
+
+        <section class="results-section hidden" id="sectionArtists">
+            <div class="section-header">
+                <h2><i class="fas fa-user"></i> Artists</h2>
+            </div>
+            <div class="results-list results-list--episodes" id="resultsArtists"></div>
+        </section>
+
+        <section class="results-section hidden" id="sectionGenres">
+            <div class="section-header">
+                <h2><i class="fas fa-tags"></i> Genres</h2>
+            </div>
+            <div class="results-list results-list--episodes" id="resultsGenres"></div>
+        </section>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/search-page.js') }}?v={{ cache_bust }}" data-page-asset="js/search-page.js"></script>
+{% endblock %}

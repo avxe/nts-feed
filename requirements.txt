@@ -1,0 +1,49 @@
+# NTS Feed Dependencies
+#
+# Version Pinning Strategy:
+# - ~= (compatible release): Allows patch updates within minor version
+#   Example: ~=2.0.0 allows 2.0.1, 2.0.2, but not 2.1.0
+# - == (exact): Used for packages with known API stability requirements
+#
+# ==============================================================================
+# Web Framework
+# ==============================================================================
+flask~=2.3.0
+flask-talisman~=1.1.0
+gunicorn~=23.0.0
+# Used by Werkzeug reloader when installed (better Docker bind-mount watching)
+watchdog~=4.0.0
+
+# ==============================================================================
+# HTTP & Scraping
+# ==============================================================================
+requests~=2.32.0
+beautifulsoup4~=4.12.0
+
+# ==============================================================================
+# Audio/Media Processing
+# ==============================================================================
+yt-dlp~=2024.8.0
+mutagen~=1.47.0
+ffmpeg-python~=0.2.0
+music-tag~=0.4.3
+Pillow~=10.0.0
+
+# ==============================================================================
+# API Clients
+# ==============================================================================
+# Google APIs - pinned exactly due to strict API versioning requirements
+google-api-python-client==2.107.0
+google-auth-httplib2==0.1.1
+google-auth-oauthlib==1.1.0
+
+# ==============================================================================
+# Database
+# ==============================================================================
+SQLAlchemy~=2.0.0
+
+# ==============================================================================
+# Utilities
+# ==============================================================================
+python-dotenv~=1.0.0
+cssutils~=2.9.0

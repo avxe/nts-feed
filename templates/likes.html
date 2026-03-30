@@ -1,0 +1,138 @@
+{% extends 'base_partial.html' if is_partial else 'base.html' %}
+
+{% block title %}Liked - NTS Feed{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/likes.css') }}?v={{ cache_bust }}" data-page-asset="css/pages/likes.css">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-header">
+      <div class="page-title-row">
+        <h1 class="page-title"><i class="fas fa-heart"></i> Likes</h1>
+        <div class="page-actions">
+          <button id="createPlaylistBtn" class="action-btn" title="Create New Playlist">
+            <i class="fas fa-plus"></i>
+            <span>New Playlist</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="likes-layout">
+      <!-- Playlists Sidebar -->
+      <aside class="playlists-sidebar">
+        <div class="playlists-header">
+          <h2>Library</h2>
+        </div>
+        <div class="playlist-list" id="playlistList">
+          <div class="playlist-item active" data-playlist-id="all">
+            <i class="fas fa-music"></i>
+            <span class="playlist-name">Liked Tracks</span>
+            <span class="playlist-count" id="allLikedCount">0</span>
+          </div>
+          <div class="playlist-item" data-playlist-id="episodes">
+            <i class="fas fa-broadcast-tower"></i>
+            <span class="playlist-name">Liked Episodes</span>
+            <span class="playlist-count" id="likedEpisodesCount">0</span>
+          </div>
+          <div class="playlist-divider"></div>
+          <!-- Dynamic playlists will be inserted here -->
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="likes-main">
+        <div class="likes-content-header">
+          <div class="likes-content-title">
+            <h2 id="currentPlaylistName">All Liked Tracks</h2>
+            <span class="likes-count" id="currentTrackCount">0 tracks</span>
+          </div>
+          <div class="likes-content-actions-left">
+            <button id="playAllBtn" class="play-all-btn" title="Play All">
+              <i class="fas fa-play"></i>
+            </button>
+          </div>
+          <div class="likes-content-actions hidden" id="playlistActions">
+            <button id="renamePlaylistBtn" class="icon-btn" title="Rename Playlist">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button id="deletePlaylistBtn" class="icon-btn danger" title="Delete Playlist">
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="likes-search-container">
+          <div class="likes-search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="likesSearch" placeholder="Search liked tracks..." autocomplete="off">
+          </div>
+        </div>
+
+        <div class="likes-tracks-list" id="likedTracksList">
+          <div class="loading-indicator">
+            <div class="loading-spinner">
+              <svg width="40" height="40" viewBox="0 0 24 24">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="4"></circle>
+              </svg>
+            </div>
+            <p>Loading liked tracks...</p>
+          </div>
+        </div>
+
+        <div class="likes-empty-state hidden" id="emptyState">
+          <i class="fas fa-heart-broken"></i>
+          <h3>No liked tracks yet</h3>
+          <p>Click the heart icon on any track to add it to your liked songs.</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Rename Playlist Modal -->
+  <div id="renameModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Rename Playlist</h3>
+        <button type="button" class="modal-close" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="renameInput" placeholder="Playlist name" autocomplete="off">
+        <textarea id="descriptionInput" placeholder="Description (optional)" rows="2"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="cancelRename">Cancel</button>
+        <button type="button" class="btn-primary" id="confirmRename">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Playlist Modal -->
+  <div id="createPlaylistModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Create New Playlist</h3>
+        <button type="button" class="modal-close" aria-label="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="newPlaylistName" placeholder="Playlist name" autocomplete="off">
+        <textarea id="newPlaylistDescription" placeholder="Description (optional)" rows="2"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="cancelCreatePlaylist">Cancel</button>
+        <button type="button" class="btn-primary" id="confirmCreatePlaylist">Create</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/nts-audio-player.js') }}?v={{ cache_bust }}" data-page-asset="js/nts-audio-player.js"></script>
+<script src="{{ url_for('static', filename='js/likes.js') }}?v={{ cache_bust }}" data-page-asset="js/likes.js"></script>
+{% endblock %}
