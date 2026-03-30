@@ -67,7 +67,7 @@ def test_check_env_rejects_placeholder_docker_mount_paths(tmp_path: Path) -> Non
             [
                 "SECRET_KEY=test-secret-key",
                 "AUTO_ADD_DIR_HOST=/absolute/path/to/Automatically Add to Music.localized",
-                "MUSIC_DIR_HOST=/absolute/path/to/Music/Compilations/NTS",
+                "MUSIC_DIR_HOST=/absolute/path/to/Music/Compilations/NTS",  # pragma: allowlist secret
             ]
         )
         + "\n",

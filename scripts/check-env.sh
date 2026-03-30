@@ -31,7 +31,7 @@ if [ ! -f .env ]; then
     add_issue ".env does not exist. Run \`make setup\` or \`make quickstart\` first."
 else
     secret_key="$(read_env_value SECRET_KEY)"
-    if [ -z "$secret_key" ] || [ "$secret_key" = "your_secret_key_here" ]; then
+    if [ -z "$secret_key" ] || [ "$secret_key" = "your_secret_key_here" ]; then  # pragma: allowlist secret
         add_issue "SECRET_KEY is missing or still set to a placeholder value. Re-run \`make setup\` or edit .env."
     fi
 
