@@ -96,7 +96,7 @@ ENV_FILE=".env"
 if [ -f "$ENV_FILE" ]; then
     warn "  An existing .env file was found."
     if ! ask_yn "Overwrite it?" "n"; then
-        ok "  Setup cancelled. Your existing .env was not modified."
+        ok "  Keeping your existing .env. No changes were made."
         exit 0
     fi
     echo ""
@@ -262,11 +262,11 @@ printf "${BOLD}${CYAN}  ── Next Steps ──${RESET}\n"
 echo ""
 echo "  1. Start the app:"
 echo ""
-printf "     ${BOLD}docker compose build${RESET}\n"
-printf "     ${BOLD}docker compose up -d${RESET}\n"
+printf "     ${BOLD}make quickstart${RESET}\n"
 echo ""
 echo "  2. Open https://localhost in your browser"
 echo ""
+dim "  Tip: Run 'make docker-check' if Docker is installed but quickstart fails before build."
 dim "  Tip: Run 'docker compose logs -f web nginx' to watch startup progress."
 dim "  Tip: You can add or change API keys later by editing .env"
 dim "       and running 'docker compose restart web'."

@@ -1,5 +1,5 @@
-.PHONY: help setup quickstart install install-dev test lint format clean \
-       docker-build docker-up docker-down docker-prod docker-dev docker-logs
+.PHONY: help setup ensure-env quickstart install install-dev test lint format clean \
+       docker-check docker-build docker-up docker-down docker-prod docker-dev docker-logs
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -12,7 +12,14 @@ help: ## Show this help
 setup: ## Interactive setup wizard — generates .env with feature selection
 	@bash ./setup.sh
 
-quickstart: setup docker-build docker-up ## Run setup, build, and start containers
+ensure-env: ## Create .env if missing, otherwise reuse the existing file
+	@if [ -f .env ]; then \
+		printf "Using existing .env\\n"; \
+	else \
+		bash ./setup.sh; \
+	fi
+
+quickstart: ensure-env docker-build docker-up ## Create .env if needed, then build and start containers
 
 # ---------------------------------------------------------------------------
 # Local development
@@ -43,20 +50,23 @@ clean: ## Remove caches and build artifacts
 # Docker
 # ---------------------------------------------------------------------------
 
-docker-build: ## Build Docker image
+docker-check: ## Verify Docker, Compose/buildx, and the daemon are ready
+	@bash ./scripts/check-docker.sh
+
+docker-build: docker-check ## Build Docker image
 	docker compose build
 
-docker-up: ## Start tracked dev containers
+docker-up: docker-check ## Start tracked dev containers
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
 
 docker-down: ## Stop containers
 	docker compose down
 
-docker-prod: ## Start the production compose file only
+docker-prod: docker-check ## Start the production compose file only
 	docker compose -f docker-compose.yml up -d
 
-docker-dev: ## Foreground tracked dev stack
+docker-dev: docker-check ## Foreground tracked dev stack
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
-docker-logs: ## Tail container logs
+docker-logs: docker-check ## Tail container logs
 	docker compose logs -f --tail=100

@@ -13,15 +13,25 @@ This document covers the supported ways to run NTS Feed locally.
 ```bash
 git clone https://github.com/avxe/nts-feed.git
 cd nts-feed
-make setup
-docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+make quickstart
 ```
 
 Open [https://localhost](https://localhost).
 
+`make quickstart` creates `.env` when needed, reuses an existing `.env` without prompting again, checks Docker prerequisites, builds the image, and starts the tracked dev stack.
+
+If you want to manage setup and container startup separately:
+
+```bash
+make setup
+make docker-build
+make docker-up
+```
+
 ### Verify startup
 
 ```bash
+make docker-check
 docker compose ps
 docker compose logs -f web nginx
 ```
@@ -90,7 +100,8 @@ python -m build --sdist --wheel
 
 ## Troubleshooting
 
-- `Cannot connect to the Docker daemon`: start Docker.
+- `Cannot connect to the Docker daemon`: start Docker, wait for it to finish booting, then rerun `make docker-check`.
+- `Docker Compose requires buildx plugin to be installed`: update Docker Desktop or install the Docker buildx plugin, then rerun `make docker-check`.
 - Port `80` or `443` already in use: change nginx host port mappings.
 - HTTPS warning in browser: expected for the local self-signed certificate.
 - First load is slow: the app may be rebuilding the SQLite query store or warming assets.

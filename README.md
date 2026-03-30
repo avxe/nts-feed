@@ -20,13 +20,18 @@ You'll need [Docker Desktop](https://www.docker.com/products/docker-desktop/) in
 ```bash
 git clone https://github.com/avxe/nts-feed.git
 cd nts-feed
-make setup
 make quickstart
 ```
 
-`make setup` walks you through creating a `.env` file. `make quickstart` builds and starts everything.
+`make quickstart` walks you through creating a `.env` file if one is missing, reuses your existing `.env` if it already exists, checks Docker/Compose/buildx, and then builds and starts everything.
 
 Open [https://localhost](https://localhost) when it's ready. You'll see a self-signed certificate warning — that's normal for local HTTPS, just click through it.
+
+If Docker is installed but `make quickstart` stops before build, run:
+
+```bash
+make docker-check
+```
 
 To watch what's happening:
 
