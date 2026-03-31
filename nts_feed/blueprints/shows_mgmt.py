@@ -136,114 +136,116 @@ def subscribe_async():
     current_app._get_current_object().subscribe_queues[subscribe_id] = progress_queue
 
     image_cache_service = get_image_cache()
+    app = current_app._get_current_object()
 
     def worker():
-        try:
-            shows = load_shows()
-            if url in shows:
-                progress_queue.put({'type': 'completed', 'already_exists': True})
-                progress_queue.put(None)
-                return
-
-            def on_progress(event):
-                event = dict(event)
-                if event.get('type') == 'completed':
-                    event['type'] = 'scrape_completed'
-                event['subscribe_id'] = subscribe_id
-                progress_queue.put(event)
-
-            show_data = scrape_nts_show_progress(
-                url, on_progress=on_progress, defer_tracklists=defer_tracklists,
-            )
-            if not show_data:
-                progress_queue.put({'type': 'error', 'message': 'Failed to scrape show data'})
-                progress_queue.put(None)
-                return
-
-            for episode in show_data['episodes']:
-                episode['is_new'] = False
-
-            shows[url] = {
-                'title': show_data.get('title', ''),
-                'description': show_data.get('description', ''),
-                'thumbnail': show_data.get('thumbnail') or (
-                    show_data['episodes'][0].get('image_url', '') if show_data['episodes'] else ''
-                ),
-                'total_episodes': len(show_data['episodes']),
-                'new_episodes': 0,
-                'last_updated': datetime.now().isoformat(),
-                'first_seen': datetime.now().isoformat(),
-                'auto_download': False,
-            }
-            save_shows(shows)
-
-            show_slug = slugify(url)
-            save_episodes(show_slug, {'episodes': show_data['episodes']})
-            progress_queue.put({'type': 'saved', 'total': len(show_data['episodes'])})
-
-            # Warm thumbnail cache
+        with app.app_context():
             try:
-                urls_to_prefetch = []
-                show_thumb = shows[url].get('thumbnail')
-                if show_thumb:
-                    urls_to_prefetch.append(show_thumb)
-                for ep in show_data.get('episodes', [])[:200]:
-                    thumb = ep.get('image_url')
-                    if thumb:
-                        urls_to_prefetch.append(thumb)
-                if urls_to_prefetch and image_cache_service:
-                    image_cache_service.prefetch_many(urls_to_prefetch, concurrency=8)
-            except Exception:
-                pass
+                shows = load_shows()
+                if url in shows:
+                    progress_queue.put({'type': 'completed', 'already_exists': True})
+                    progress_queue.put(None)
+                    return
 
-            # Auto-trigger sync after adding a new show
-            try:
-                from .api_db import get_running_sync_job, start_sync_job
+                def on_progress(event):
+                    event = dict(event)
+                    if event.get('type') == 'completed':
+                        event['type'] = 'scrape_completed'
+                    event['subscribe_id'] = subscribe_id
+                    progress_queue.put(event)
 
-                existing_sync = get_running_sync_job()
-                if existing_sync:
+                show_data = scrape_nts_show_progress(
+                    url, on_progress=on_progress, defer_tracklists=defer_tracklists,
+                )
+                if not show_data:
+                    progress_queue.put({'type': 'error', 'message': 'Failed to scrape show data'})
+                    progress_queue.put(None)
+                    return
+
+                for episode in show_data['episodes']:
+                    episode['is_new'] = False
+
+                shows[url] = {
+                    'title': show_data.get('title', ''),
+                    'description': show_data.get('description', ''),
+                    'thumbnail': show_data.get('thumbnail') or (
+                        show_data['episodes'][0].get('image_url', '') if show_data['episodes'] else ''
+                    ),
+                    'total_episodes': len(show_data['episodes']),
+                    'new_episodes': 0,
+                    'last_updated': datetime.now().isoformat(),
+                    'first_seen': datetime.now().isoformat(),
+                    'auto_download': False,
+                }
+                save_shows(shows)
+
+                show_slug = slugify(url)
+                save_episodes(show_slug, {'episodes': show_data['episodes']})
+                progress_queue.put({'type': 'saved', 'total': len(show_data['episodes'])})
+
+                # Warm thumbnail cache
+                try:
+                    urls_to_prefetch = []
+                    show_thumb = shows[url].get('thumbnail')
+                    if show_thumb:
+                        urls_to_prefetch.append(show_thumb)
+                    for ep in show_data.get('episodes', [])[:200]:
+                        thumb = ep.get('image_url')
+                        if thumb:
+                            urls_to_prefetch.append(thumb)
+                    if urls_to_prefetch and image_cache_service:
+                        image_cache_service.prefetch_many(urls_to_prefetch, concurrency=8)
+                except Exception:
+                    pass
+
+                # Auto-trigger sync after adding a new show
+                try:
+                    from .api_db import get_running_sync_job, start_sync_job
+
+                    existing_sync = get_running_sync_job()
+                    if existing_sync:
+                        _queue_sync_status(
+                            progress_queue,
+                            status='started',
+                            sync_job_id=existing_sync,
+                            message='Waiting for in-progress database sync...',
+                        )
+                        sync_job_id = existing_sync
+                    else:
+                        sync_job_id = start_sync_job(trigger='auto_subscribe')
+                        _queue_sync_status(
+                            progress_queue,
+                            status='started',
+                            sync_job_id=sync_job_id,
+                            message='Syncing database...',
+                        )
+
+                    sync_completed = _wait_for_sync_completion(progress_queue, sync_job_id)
+                    if not sync_completed:
+                        progress_queue.put({
+                            'type': 'error',
+                            'message': 'Show was saved, but the database sync did not finish. Discover, stats, and admin may update after the next successful sync.',
+                        })
+                        return
+                except Exception as sync_err:
                     _queue_sync_status(
                         progress_queue,
-                        status='started',
-                        sync_job_id=existing_sync,
-                        message='Waiting for in-progress database sync...',
+                        status='failed',
+                        error=str(sync_err),
+                        message=f'Sync failed: {sync_err}',
                     )
-                    sync_job_id = existing_sync
-                else:
-                    sync_job_id = start_sync_job(trigger='auto_subscribe')
-                    _queue_sync_status(
-                        progress_queue,
-                        status='started',
-                        sync_job_id=sync_job_id,
-                        message='Syncing database...',
-                    )
-
-                sync_completed = _wait_for_sync_completion(progress_queue, sync_job_id)
-                if not sync_completed:
                     progress_queue.put({
                         'type': 'error',
-                        'message': 'Show was saved, but the database sync did not finish. Discover, stats, and admin may update after the next successful sync.',
+                        'message': 'Show was saved, but the database sync failed. Discover, stats, and admin may update after the next successful sync.',
                     })
                     return
-            except Exception as sync_err:
-                _queue_sync_status(
-                    progress_queue,
-                    status='failed',
-                    error=str(sync_err),
-                    message=f'Sync failed: {sync_err}',
-                )
-                progress_queue.put({
-                    'type': 'error',
-                    'message': 'Show was saved, but the database sync failed. Discover, stats, and admin may update after the next successful sync.',
-                })
-                return
 
-            progress_queue.put({'type': 'completed', 'total': len(show_data['episodes'])})
+                progress_queue.put({'type': 'completed', 'total': len(show_data['episodes'])})
 
-        except Exception as e:
-            progress_queue.put({'type': 'error', 'message': str(e)})
-        finally:
-            progress_queue.put(None)
+            except Exception as e:
+                progress_queue.put({'type': 'error', 'message': str(e)})
+            finally:
+                progress_queue.put(None)
 
     get_executor().submit(worker)
     return jsonify({'success': True, 'subscribe_id': subscribe_id})
