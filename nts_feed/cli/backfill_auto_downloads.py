@@ -5,15 +5,15 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import pathlib
 import shutil
 from datetime import datetime
 
+from ..runtime_paths import downloads_dir
 from ..downloader import download, download_manager
 from ..scrape import load_episodes, load_shows, slugify
 from ..track_manager import TrackManager
 
-DOWNLOAD_DIR = pathlib.Path('downloads')
+DOWNLOAD_DIR = downloads_dir()
 
 
 def backfill_auto_downloads():

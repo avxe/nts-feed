@@ -26,6 +26,7 @@ except Exception:
 
 from . import __version__
 from .db.bootstrap import bootstrap_database
+from .runtime_paths import ensure_runtime_layout
 from .settings import apply_saved_settings_to_env
 from .services_init import init_services
 
@@ -57,8 +58,8 @@ def _is_main_worker() -> bool:
 def create_app():
     """Create and configure the Flask application."""
     load_dotenv()
+    ensure_runtime_layout()
     apply_saved_settings_to_env()
-    os.makedirs('data', exist_ok=True)
 
     package_dir = pathlib.Path(__file__).resolve().parent
     project_root = package_dir.parent

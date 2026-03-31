@@ -14,6 +14,7 @@ from cssutils import parseStyle
 from bs4 import BeautifulSoup
 import music_tag
 
+from .runtime_paths import downloads_dir
 from .track_manager import TrackManager
 
 __version__ = '1.3.4'
@@ -634,7 +635,7 @@ def main():
     arg = sys.argv[1]
     
     # Set download directory (either from args or default)
-    download_dir = sys.argv[2] if len(sys.argv) > 2 else os.path.join(os.getcwd(), 'downloads')
+    download_dir = sys.argv[2] if len(sys.argv) > 2 else str(downloads_dir())
     os.makedirs(download_dir, exist_ok=True)
 
     # Process input

@@ -12,6 +12,8 @@ import hashlib
 from typing import Optional, Dict, Any
 from pathlib import Path
 
+from ..runtime_paths import cache_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,14 +28,14 @@ class CacheService:
     - Thread-safe operations
     """
     
-    def __init__(self, cache_dir: str = "cache/nts"):
+    def __init__(self, cache_dir: str | None = None):
         """
         Initialize the cache service
         
         Args:
             cache_dir: Directory to store cache files
         """
-        self.cache_dir = Path(cache_dir)
+        self.cache_dir = Path(cache_dir) if cache_dir else cache_path("nts")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
         # Default TTL values (in seconds)
@@ -338,4 +340,3 @@ def with_cache(category: str, ttl: Optional[int] = None):
         
         return wrapper
     return decorator
-

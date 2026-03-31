@@ -7,16 +7,17 @@ from datetime import datetime
 import shutil
 import logging
 
+from .runtime_paths import auto_add_dir, downloaded_tracks_path, music_dir as default_music_dir
 from .trimmer import trim_audio_file
 
 logger = logging.getLogger(__name__)
 
 
 class TrackManager:
-    def __init__(self, music_dir='music_dir'):
-        self.music_dir = music_dir
+    def __init__(self, music_dir=None):
+        self.music_dir = str(music_dir or default_music_dir())
         # Store database file in the local data directory
-        self.db_file = 'data/downloaded_tracks.json'
+        self.db_file = str(downloaded_tracks_path())
         self.ensure_data_directory()
         self.downloaded_tracks = self.load_database()
         logger.debug("TrackManager initialized")
@@ -171,20 +172,20 @@ class TrackManager:
                     logger.warning("Trimming failed, proceeding with original file")
                     trimmed_path = source_path
 
-            auto_add_dir = os.getenv('AUTO_ADD_DIR', '/app/auto_add_dir')
+            destination_dir = str(auto_add_dir())
 
             # Print debug information
             logger.info(f"Source path: {trimmed_path}")
-            logger.info(f"Destination directory: {auto_add_dir}")
+            logger.info(f"Destination directory: {destination_dir}")
 
             # Verify file existence
             if not os.path.exists(trimmed_path):
                 logger.error(f"Source file not found: {trimmed_path}")
                 raise FileNotFoundError(f"Source file not found: {trimmed_path}")
 
-            if not os.path.exists(auto_add_dir):
-                logger.error(f"Auto-add directory not found: {auto_add_dir}")
-                raise FileNotFoundError(f"Auto-add directory not found: {auto_add_dir}")
+            if not os.path.exists(destination_dir):
+                logger.error(f"Auto-add directory not found: {destination_dir}")
+                raise FileNotFoundError(f"Auto-add directory not found: {destination_dir}")
 
             # Get file metadata before moving
             f = music_tag.load_file(trimmed_path)
@@ -192,7 +193,7 @@ class TrackManager:
 
             # Move file to auto-add directory using shutil.move
             filename = os.path.basename(trimmed_path)
-            dest_path = os.path.join(auto_add_dir, filename)
+            dest_path = os.path.join(destination_dir, filename)
             logger.info(f"Destination path: {dest_path}")
             shutil.move(trimmed_path, dest_path)
 

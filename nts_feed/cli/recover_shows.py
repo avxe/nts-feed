@@ -7,6 +7,8 @@ import json
 import shutil
 from pathlib import Path
 
+from ..runtime_paths import shows_backup_path, shows_path
+
 
 def _load_json(path: Path):
     with path.open('r', encoding='utf-8') as handle:
@@ -14,8 +16,8 @@ def _load_json(path: Path):
 
 
 def recover_shows(
-    shows_path: str = 'shows.json',
-    backup_path: str = 'shows.json.backup',
+    shows_path: str = str(shows_path()),
+    backup_path: str = str(shows_backup_path()),
     *,
     force_backup: bool = False,
     dry_run: bool = False,
@@ -73,9 +75,9 @@ def recover_shows(
 
 
 def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description='Validate or restore shows.json from shows.json.backup.')
-    parser.add_argument('--shows-path', default='shows.json', help='Path to the primary shows.json file.')
-    parser.add_argument('--backup-path', default='shows.json.backup', help='Path to the backup file.')
+    parser = argparse.ArgumentParser(description='Validate or restore shows.json from its backup file.')
+    parser.add_argument('--shows-path', default=str(shows_path()), help='Path to the primary shows.json file.')
+    parser.add_argument('--backup-path', default=str(shows_backup_path()), help='Path to the backup file.')
     parser.add_argument('--force-backup', action='store_true', help='Restore from backup even if shows.json parses.')
     parser.add_argument('--dry-run', action='store_true', help='Report the recovery plan without copying files.')
     return parser.parse_args(argv)

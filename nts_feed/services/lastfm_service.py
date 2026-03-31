@@ -9,6 +9,7 @@ from typing import List, Dict, Optional
 from dotenv import load_dotenv
 # Import the DiscogsService
 from .discogs_service import DiscogsService
+from ..runtime_paths import cache_path
 
 # Load environment variables
 load_dotenv()
@@ -29,7 +30,7 @@ class LastFmService:
         self.discogs_service = DiscogsService()
         
         # Setup caching
-        self.cache_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..', 'cache', 'lastfm')
+        self.cache_dir = str(cache_path('lastfm'))
         os.makedirs(self.cache_dir, exist_ok=True)
         
         # Cache TTL settings (in seconds)
@@ -920,5 +921,4 @@ class LastFmService:
             # Cache the error result
             self._set_cached_data('track_info', None, artist_name, track_name)
             return None
-
 

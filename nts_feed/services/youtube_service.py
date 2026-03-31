@@ -20,6 +20,7 @@ from googleapiclient.errors import HttpError
 from sqlalchemy import func, or_, select
 
 from ..db.models import Artist, Track
+from ..runtime_paths import youtube_cache_dir
 
 # Set up logging
 logger = logging.getLogger('youtube_service')
@@ -64,7 +65,7 @@ class YouTubeService:
             api_key: YouTube API key
         """
         self.api_key = api_key
-        self.cache_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'data', 'youtube_cache')
+        self.cache_dir = str(youtube_cache_dir())
         self.cache_expiry = 30 * 24 * 60 * 60  # 30 days in seconds
         self.last_request_time = 0
         self.request_interval = 1.0  # 1 second between requests to avoid quota issues

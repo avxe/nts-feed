@@ -4,28 +4,51 @@ set -euo pipefail
 
 ROOT_DIR="${NTS_FEED_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 OPENSSL_BIN="${OPENSSL_BIN:-openssl}"
+PYTHON_BIN="${PYTHON_BIN:-python3}"
 
 cd "$ROOT_DIR"
 
-mkdir -p episodes thumbnails downloads data config/nginx/ssl auto_add_dir music_dir
+mkdir -p config/nginx/ssl
 
-repair_shows_json() {
-    local backup_path
+prepare_storage_layout() {
+    local script_repo_root
+    script_repo_root="$(cd "$(dirname "$0")/.." && pwd)"
 
-    if [ -d shows.json ]; then
-        backup_path="shows.json.dir-backup.$(date +%Y%m%d%H%M%S)"
-        mv shows.json "$backup_path"
-        printf 'Moved unexpected shows.json directory to %s\n' "$backup_path"
-    fi
-
-    if [ ! -e shows.json ]; then
-        printf '{}\n' > shows.json
-    fi
-
-    if [ ! -f shows.json ]; then
-        printf 'Failed to prepare shows.json as a file.\n' >&2
+    if ! command -v "$PYTHON_BIN" >/dev/null 2>&1; then
+        printf 'Python 3 is required to prepare runtime storage.\n' >&2
         exit 1
     fi
+
+    NTS_FEED_ROOT="$ROOT_DIR" NTS_FEED_SCRIPT_REPO_ROOT="$script_repo_root" "$PYTHON_BIN" - <<'PY'
+import importlib
+import os
+import sys
+import types
+from pathlib import Path
+
+repo_root = os.environ["NTS_FEED_SCRIPT_REPO_ROOT"]
+package_root = Path(repo_root) / "nts_feed"
+storage_root = package_root / "storage"
+
+pkg = types.ModuleType("nts_feed")
+pkg.__path__ = [str(package_root)]
+sys.modules["nts_feed"] = pkg
+
+storage_pkg = types.ModuleType("nts_feed.storage")
+storage_pkg.__path__ = [str(storage_root)]
+sys.modules["nts_feed.storage"] = storage_pkg
+
+module = importlib.import_module("nts_feed.runtime_paths")
+
+result = module.ensure_runtime_layout()
+for backed_up in result["backed_up"]:
+    print(f"Backed up legacy runtime path to {backed_up}")
+for moved in result["moved"]:
+    print(f"Migrated {moved}")
+for created in result["created"]:
+    print(f"Created {created}")
+print(f"Storage root ready at {module.storage_root()}")
+PY
 }
 
 generate_local_certs() {
@@ -56,6 +79,6 @@ generate_local_certs() {
     fi
 }
 
-repair_shows_json
+prepare_storage_layout
 generate_local_certs
 printf 'Runtime scaffolding is ready.\n'

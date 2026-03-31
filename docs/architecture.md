@@ -22,8 +22,8 @@ nginx
   v
 Flask application
   |
-  +-- JSON storage (shows.json, episodes/*.json)
-  +-- SQLite database
+  +-- Runtime storage (storage/shows.json, storage/episodes/*.json)
+  +-- SQLite database (storage/data/nts.db)
   +-- Background jobs (updates, downloads, maintenance)
   +-- Optional external services (Discogs, Last.fm, YouTube, media hosts)
 ```
@@ -32,8 +32,8 @@ Flask application
 
 ### Source of truth
 
-- `shows.json`: subscribed show metadata.
-- `episodes/<slug>.json`: episode metadata per show.
+- `storage/shows.json`: subscribed show metadata.
+- `storage/episodes/<slug>.json`: episode metadata per show.
 
 ### Derived/query data
 

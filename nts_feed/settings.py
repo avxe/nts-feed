@@ -6,6 +6,8 @@ import json
 import os
 from pathlib import Path
 
+from .runtime_paths import settings_file_path
+
 
 DEFAULT_SETTINGS = {
     "TRIM_ENABLED": True,
@@ -26,7 +28,7 @@ def get_settings_path() -> Path:
     custom_path = os.getenv("NTS_SETTINGS_PATH")
     if custom_path:
         return Path(custom_path)
-    return Path(__file__).resolve().parent.parent / "data" / "settings.json"
+    return settings_file_path()
 
 
 def load_raw_settings() -> dict:

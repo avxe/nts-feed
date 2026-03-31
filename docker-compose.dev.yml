@@ -5,11 +5,8 @@ services:
   web:
     volumes:
       - .:/app
-      - ./downloads:/app/downloads
-      - ./config:/config
-      - ./data:/app/data
-      - "${AUTO_ADD_DIR_HOST:-./auto_add_dir}:/app/auto_add_dir"
-      - "${MUSIC_DIR_HOST:-./music_dir}:/app/music_dir"
+      - "${AUTO_ADD_DIR_HOST:-./storage/auto_add_dir}:/app/storage/auto_add_dir"
+      - "${MUSIC_DIR_HOST:-./storage/music_dir}:/app/storage/music_dir"
     environment:
       - FLASK_DEBUG=1
       - PYTHONUNBUFFERED=1

@@ -33,7 +33,7 @@ If Docker is installed but `make quickstart` stops before build, run:
 make docker-check
 ```
 
-`make quickstart` also validates `.env`, repairs local runtime scaffolding such as `shows.json` and data directories, and fails early if ports `80` or `443` are already occupied.
+`make quickstart` also validates `.env`, repairs or migrates legacy runtime data into `storage/`, and fails early if ports `80` or `443` are already occupied.
 
 If you are actively developing on the app and want hot reload and Flask debug mode, use:
 
@@ -104,11 +104,7 @@ nts-feed/
 ├── nts_feed/        # Flask app — blueprints, services, database, CLI tools
 ├── templates/          # Jinja2 HTML templates
 ├── static/             # CSS and JavaScript (no build step needed)
-├── data/               # SQLite database (created on first run)
-├── episodes/           # Episode metadata (JSON)
-├── downloads/          # Downloaded audio files
-├── thumbnails/         # Cached artwork
-├── shows.json          # Your show subscriptions
+├── storage/            # All runtime data (db, subscriptions, episode JSON, downloads, cache)
 ├── docker-compose.yml  # Production Docker setup
 ├── Makefile            # Common commands (run `make help` to see them all)
 └── docs/               # Architecture docs, API reference, etc.
@@ -126,13 +122,14 @@ Key pieces under `nts_feed/`:
 Everything lives in local files and a SQLite database — no external database server needed.
 
 
-| Path          | What's in it                                                        |
-| ------------- | ------------------------------------------------------------------- |
-| `shows.json`  | Your subscribed shows                                               |
-| `episodes/`   | Episode metadata per show                                           |
-| `downloads/`  | Saved audio files                                                   |
-| `thumbnails/` | Cached show artwork                                                 |
-| `data/nts.db` | SQLite database (search index, likes, playlists, listening history) |
+| Path                         | What's in it                                                        |
+| ---------------------------- | ------------------------------------------------------------------- |
+| `storage/shows.json`         | Your subscribed shows                                               |
+| `storage/episodes/`          | Episode metadata per show                                           |
+| `storage/downloads/`         | Saved audio files                                                   |
+| `storage/thumbnails/`        | Cached show artwork                                                 |
+| `storage/data/nts.db`        | SQLite database (search index, likes, playlists, listening history) |
+| `storage/cache/`             | File caches for network-heavy integrations                          |
 
 
 ## Common issues

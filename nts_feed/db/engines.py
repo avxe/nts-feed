@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-import os
-
 from sqlalchemy import create_engine, event
 from sqlalchemy.pool import QueuePool
 
+from ..storage.paths import get_storage_data_dir, resolve_database_url
+
 
 def _resolve_database_url(database_url: str | None = None) -> str:
-    db_url = database_url or os.getenv('DATABASE_URL') or f"sqlite:///{os.path.abspath('data/nts.db')}"
-    os.makedirs('data', exist_ok=True)
+    db_url = resolve_database_url(database_url)
+    get_storage_data_dir().mkdir(parents=True, exist_ok=True)
     return db_url
 
 

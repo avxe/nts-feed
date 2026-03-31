@@ -8,6 +8,7 @@ import requests
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from urllib.parse import urlparse
 
+from ..runtime_paths import image_cache_dir
 
 logger = logging.getLogger(__name__)
 
@@ -21,9 +22,9 @@ class ImageCacheService:
     - Optional simple host allowlist via IMAGE_CACHE_ALLOWED_HOSTS (comma-separated)
     """
 
-    def __init__(self, cache_dir: str = "thumbnails"):
+    def __init__(self, cache_dir: str | None = None):
         # Resolve to absolute path to ensure Flask send_file works correctly
-        self.cache_dir = Path(cache_dir).resolve()
+        self.cache_dir = Path(cache_dir or image_cache_dir()).resolve()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
         # Hosts allowed to be proxied; if empty, allow all http/https hosts
@@ -204,5 +205,4 @@ class ImageCacheService:
         except Exception as e:
             logger.error("ImageCacheService.prefetch_many failed: %s", e)
             return { 'total': 0, 'fetched': 0, 'skipped': 0, 'errors': 1 }
-
 

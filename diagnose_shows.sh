@@ -8,10 +8,10 @@ echo ""
 # Check if running in Docker
 if [ -f /.dockerenv ]; then
     echo "✓ Running inside Docker container"
-    BASE_DIR="/app"
+    BASE_DIR="/app/storage"
 else
     echo "✓ Running on host system"
-    BASE_DIR="."
+    BASE_DIR="./storage"
 fi
 
 echo ""
@@ -84,7 +84,7 @@ if command -v docker &> /dev/null; then
         echo "✓ Found container: $CONTAINER"
         echo ""
         echo "Files in container:"
-        docker exec "$CONTAINER" ls -lh /app/shows.json* 2>/dev/null || echo "No shows.json files in /app/"
+        docker exec "$CONTAINER" ls -lh /app/storage/shows.json* 2>/dev/null || echo "No shows.json files in /app/storage/"
     else
         echo "No running NTS container found"
     fi
@@ -99,7 +99,7 @@ echo ""
 echo "If shows.json is corrupted:"
 echo "  1. Run: recover-shows"
 echo "  2. Or manually restore from backup:"
-echo "     cp shows.json.backup shows.json"
+echo "     cp storage/shows.json.backup storage/shows.json"
 echo ""
 echo "If no shows.json exists:"
 echo "  1. Check Docker volume for the file"

@@ -212,7 +212,8 @@ FORCE_HTTPS=false
 # DATABASE
 # ============================================================================
 
-DATABASE_URL=sqlite:///data/nts.db
+NTS_STORAGE_ROOT=storage
+DATABASE_URL=sqlite:///storage/data/nts.db
 
 # ============================================================================
 # INTEGRATIONS

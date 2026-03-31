@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 
 from .db.bootstrap import _ensure_episode_inbox_state_schema
+from .runtime_paths import image_cache_dir, music_dir
 
 
 def init_services(app):
@@ -16,14 +17,13 @@ def init_services(app):
     from .services.youtube_service import YouTubeService
     from .track_manager import TrackManager
 
-    music_dir = os.getenv('MUSIC_DIR', 'music_dir')
-    track_manager = TrackManager(music_dir=music_dir)
+    track_manager = TrackManager(music_dir=str(music_dir()))
     if not track_manager.downloaded_tracks.get('episodes'):
         track_manager.scan_directory()
     app.extensions['track_manager'] = track_manager
 
     image_cache_service = ImageCacheService(
-        cache_dir=os.getenv('IMAGE_CACHE_DIR', 'thumbnails'),
+        cache_dir=str(image_cache_dir()),
     )
     app.extensions['image_cache_service'] = image_cache_service
 

@@ -2,7 +2,6 @@
 
 import json
 import os
-import pathlib
 import queue
 import shutil
 import threading
@@ -12,11 +11,12 @@ from flask import Blueprint, Response, current_app, jsonify, request
 
 from ..downloader import download, download_manager
 from ..ext.tasks import get_executor
+from ..runtime_paths import downloads_dir
 from ..scrape import load_episodes, slugify
 
 bp = Blueprint('downloads', __name__)
 
-DOWNLOAD_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent / 'downloads'
+DOWNLOAD_DIR = downloads_dir()
 DOWNLOAD_DIR.mkdir(exist_ok=True)
 
 

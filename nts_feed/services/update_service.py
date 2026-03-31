@@ -8,7 +8,6 @@ Provides significant performance improvements over sequential processing.
 import logging
 import os
 import shutil
-import pathlib
 import threading
 import time
 import uuid
@@ -24,11 +23,12 @@ from ..scrape import (
 )
 from ..downloader import download, download_manager
 from ..ext.tasks import get_executor
+from ..runtime_paths import downloads_dir
 
 logger = logging.getLogger(__name__)
 
-# Downloads directory (project_root/downloads)
-DOWNLOAD_DIR = pathlib.Path(__file__).resolve().parent.parent / 'downloads'
+# Downloads directory (storage/downloads)
+DOWNLOAD_DIR = downloads_dir()
 DOWNLOAD_DIR.mkdir(exist_ok=True)
 
 

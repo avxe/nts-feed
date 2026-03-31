@@ -46,8 +46,8 @@ docker compose logs -f web nginx
 
 - `.env` exists and `SECRET_KEY` is set
 - placeholder host mount paths from `env.example` are not still present
-- `shows.json` is a file, not a directory
-- runtime directories exist
+- runtime storage is consolidated under `storage/`
+- legacy root-level runtime files are migrated into `storage/`
 - local self-signed certs exist, or Docker can generate them later
 - Docker, Compose v2, `buildx`, and the daemon are available
 - ports `80` and `443` are free before nginx starts
@@ -131,4 +131,4 @@ python -m build --sdist --wheel
 - Port `80` or `443` already in use: change nginx host port mappings.
 - HTTPS warning in browser: expected for the local self-signed certificate.
 - First load is slow: the app may be rebuilding the SQLite query store or warming assets.
-- `shows.json` errors on startup: rerun `make runtime-bootstrap` so the bind-mounted file exists as a file, not a directory.
+- storage-layout errors on startup: rerun `make runtime-bootstrap` so `storage/` is rebuilt and any legacy runtime files are migrated.

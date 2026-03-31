@@ -124,6 +124,9 @@ config/cron.log
 # Project-specific data
 # --------------------
 .cache
+storage/
+!nts_feed/storage/
+!nts_feed/storage/*.py
 data/
 data-backup.zip
 episodes/

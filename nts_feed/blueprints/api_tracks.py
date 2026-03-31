@@ -8,6 +8,7 @@ from urllib.parse import urlsplit, urlunsplit
 from flask import Blueprint, current_app, jsonify, make_response, request
 from sqlalchemy.orm import selectinload
 
+from ..runtime_paths import genre_taxonomy_cache_path
 from ..scrape import load_episodes, load_shows, slugify, _fetch_episode_page
 from ..services.audio_service import AudioService
 
@@ -434,12 +435,11 @@ def api_genres_explore():
 
         if genre:
             try:
-                from pathlib import Path
                 from ..services.genre_taxonomy_service import GenreTaxonomyService
 
-                cache_path = Path('data/genre_taxonomy.json')
+                cache_path = genre_taxonomy_cache_path()
                 if cache_path.exists():
-                    taxonomy_service = GenreTaxonomyService(cache_dir='data/')
+                    taxonomy_service = GenreTaxonomyService(cache_dir=str(cache_path.parent))
                     similar = taxonomy_service.get_similar_genres(genre, min_similarity=0.2)
                     family = taxonomy_service.get_genre_family(genre)
                     result['related_genres'] = [

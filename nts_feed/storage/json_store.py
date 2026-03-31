@@ -5,6 +5,8 @@ import fcntl
 from contextlib import contextmanager
 from typing import Any, Callable, Optional
 
+from ..runtime_paths import episodes_dir, shows_path
+
 
 def _ensure_parent_dir(file_path: str) -> None:
     parent = os.path.dirname(os.path.abspath(file_path))
@@ -96,15 +98,14 @@ class JsonDocumentStore:
 # Typed helpers
 def get_shows_store() -> JsonDocumentStore:
     return JsonDocumentStore(
-        path="shows.json",
+        path=str(shows_path()),
         default_factory=lambda: {}
     )
 
 
 def get_episodes_store(slug: str) -> JsonDocumentStore:
     return JsonDocumentStore(
-        path=os.path.join("episodes", f"{slug}.json"),
+        path=str(episodes_dir() / f"{slug}.json"),
         default_factory=lambda: {"episodes": []}
     )
-
 

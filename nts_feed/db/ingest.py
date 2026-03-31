@@ -27,6 +27,8 @@ from sqlalchemy.exc import OperationalError
 from sqlalchemy.dialects import sqlite as sqlite_dialect
 from sqlalchemy.dialects import postgresql as pg_dialect
 
+from ..runtime_paths import episodes_dir as runtime_episodes_dir, shows_path as runtime_shows_path
+from ..storage.paths import get_rebuild_lock_path
 from .models import (
     Base,
     Show,
@@ -184,13 +186,11 @@ def _deduplicate_episodes(episodes: List[dict]) -> List[dict]:
     return unique
 
 
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
 # Global thread lock to prevent concurrent database rebuilds within same process
 _rebuild_lock = threading.Lock()
 
 # File-based lock path for cross-process synchronization
-_REBUILD_LOCK_FILE = os.path.join(ROOT_DIR, "data", ".rebuild.lock")
+_REBUILD_LOCK_FILE = str(get_rebuild_lock_path())
 
 
 def _acquire_file_lock() -> Optional[int]:
@@ -485,8 +485,8 @@ def rebuild_database_from_json(
         progress.phase = "loading_json"
         _report_progress()
         
-        shows_path = os.path.join(ROOT_DIR, "shows.json")
-        episodes_dir = os.path.join(ROOT_DIR, "episodes")
+        shows_path = str(runtime_shows_path())
+        episodes_dir = str(runtime_episodes_dir())
         
         shows_list, slug_to_episodes, total_episodes = _preprocess_json_data(
             shows_path, episodes_dir
@@ -782,8 +782,8 @@ def incremental_update_from_json(
     start_time = time.time()
     counters = defaultdict(int)
     
-    shows_path = os.path.join(ROOT_DIR, "shows.json")
-    episodes_dir = os.path.join(ROOT_DIR, "episodes")
+    shows_path = str(runtime_shows_path())
+    episodes_dir = str(runtime_episodes_dir())
     
     if not os.path.exists(shows_path):
         return {"message": "No shows.json found"}

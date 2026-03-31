@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import json
 import os
-import fcntl
+import shutil
 from datetime import datetime
 from urllib.parse import urlparse
 from requests.adapters import HTTPAdapter
@@ -11,7 +11,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 from .services.cache_service import cache_service, with_cache
 from dotenv import load_dotenv
-from .storage.json_store import get_episodes_store
+from .runtime_paths import ensure_runtime_layout, shows_backup_path, shows_path
+from .storage.json_store import get_episodes_store, get_shows_store
 
 # Concurrency settings for episode page fetching
 EPISODE_FETCH_WORKERS = 15  # Number of concurrent workers for fetching episode pages
@@ -427,37 +428,32 @@ def slugify(url):
 
 def load_shows():
     """Load shows with file locking to prevent race conditions"""
-    if not os.path.exists('shows.json'):
-        print("Warning: shows.json does not exist, returning empty dict")
-        return {}
-    
+    ensure_runtime_layout()
+    store = get_shows_store()
+
     try:
-        with open('shows.json', 'r') as f:
-            # Acquire shared lock for reading
-            fcntl.flock(f.fileno(), fcntl.LOCK_SH)
-            try:
-                data = json.load(f)
-                print(f"Successfully loaded {len(data)} shows from shows.json")
-                return data
-            finally:
-                fcntl.flock(f.fileno(), fcntl.LOCK_UN)
-    except (json.JSONDecodeError, IOError) as e:
-        print(f"ERROR: Failed to load shows.json: {e}")
+        data = store.read()
+        if data is None:
+            print("Warning: shows.json does not exist, returning empty dict")
+            return {}
+        print(f"Successfully loaded {len(data)} shows from {shows_path()}")
+        return data
+    except (json.JSONDecodeError, IOError, OSError) as e:
+        print(f"ERROR: Failed to load {shows_path()}: {e}")
         # If corrupted, try to recover from backup
-        if os.path.exists('shows.json.backup'):
+        backup_path = shows_backup_path()
+        if backup_path.exists():
             print("Attempting to restore from backup...")
             try:
-                with open('shows.json.backup', 'r') as f:
+                with backup_path.open('r', encoding='utf-8') as f:
                     data = json.load(f)
-                    print(f"Successfully restored {len(data)} shows from backup")
-                    # Save the backup as the main file
-                    try:
-                        import shutil
-                        shutil.copy2('shows.json.backup', 'shows.json')
-                        print("Restored backup to shows.json")
-                    except Exception as copy_err:
-                        print(f"Warning: Could not copy backup to main file: {copy_err}")
-                    return data
+                print(f"Successfully restored {len(data)} shows from backup")
+                try:
+                    shutil.copy2(backup_path, shows_path())
+                    print(f"Restored backup to {shows_path()}")
+                except Exception as copy_err:
+                    print(f"Warning: Could not copy backup to main file: {copy_err}")
+                return data
             except Exception as backup_err:
                 print(f"ERROR: Backup is also corrupted: {backup_err}")
         else:
@@ -468,40 +464,19 @@ def load_shows():
         return {}
 
 def save_shows(shows):
-    """Save shows with file locking to prevent corruption.
+    """Save shows with backup protection and atomic writes."""
+    ensure_runtime_layout()
+    store = get_shows_store()
+    current_path = shows_path()
+    backup_path = shows_backup_path()
 
-    Uses write-in-place (open r+, seek, truncate) instead of atomic rename
-    because shows.json is a Docker bind-mounted file and os.rename() over a
-    bind mount fails with EBUSY on Linux.  Opening with 'r+' avoids
-    truncating the file before the write succeeds.
-    """
     # Create backup before writing
-    if os.path.exists('shows.json'):
+    if current_path.exists():
         try:
-            with open('shows.json', 'r') as src:
-                fcntl.flock(src.fileno(), fcntl.LOCK_SH)
-                try:
-                    with open('shows.json.backup', 'w') as dst:
-                        dst.write(src.read())
-                finally:
-                    fcntl.flock(src.fileno(), fcntl.LOCK_UN)
+            shutil.copy2(current_path, backup_path)
         except Exception as e:
             print(f"Warning: Could not create backup: {e}")
-
-    # Serialize first so a JSON error won't leave a truncated file
-    payload = json.dumps(shows, indent=4)
-
-    # Open in r+ mode (no truncation on open), then seek+truncate+write
-    with open('shows.json', 'r+') as f:
-        fcntl.flock(f.fileno(), fcntl.LOCK_EX)
-        try:
-            f.seek(0)
-            f.write(payload)
-            f.truncate()          # trim any leftover bytes from a longer previous write
-            f.flush()
-            os.fsync(f.fileno())
-        finally:
-            fcntl.flock(f.fileno(), fcntl.LOCK_UN)
+    store.write(shows)
 
 def load_episodes(show_slug):
     """Load episodes with a shared lock using the JsonDocumentStore."""

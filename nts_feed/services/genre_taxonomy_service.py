@@ -22,6 +22,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
+from ..runtime_paths import data_path
+
 logger = logging.getLogger(__name__)
 
 # Core genres to build families from
@@ -123,7 +125,7 @@ class GenreTaxonomyService:
     def __init__(
         self,
         lastfm_service=None,
-        cache_dir: str = 'data/',
+        cache_dir: str | None = None,
     ):
         """Initialize the service.
         
@@ -132,7 +134,7 @@ class GenreTaxonomyService:
             cache_dir: Directory to store the taxonomy cache
         """
         self._lastfm_service = lastfm_service
-        self.cache_dir = Path(cache_dir)
+        self.cache_dir = Path(cache_dir) if cache_dir else data_path()
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self._taxonomy: Optional[GenreTaxonomy] = None
     

@@ -2,7 +2,6 @@
 
 import json
 import os
-import pathlib
 import queue
 import shutil
 import time
@@ -12,6 +11,7 @@ from flask import Blueprint, Response, current_app, jsonify, redirect, request, 
 
 from ..downloader import download, download_manager
 from ..ext.tasks import get_executor
+from ..runtime_paths import downloads_dir, episodes_dir
 from ..scrape import (
     check_new_episodes,
     load_episodes,
@@ -28,7 +28,7 @@ from .helpers import get_image_cache
 
 bp = Blueprint('shows_mgmt', __name__)
 
-DOWNLOAD_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent / 'downloads'
+DOWNLOAD_DIR = downloads_dir()
 DOWNLOAD_DIR.mkdir(exist_ok=True)
 
 SYNC_POLL_INTERVAL_SECONDS = 0.25
@@ -431,7 +431,7 @@ def delete_show(url):
     shows = load_shows()
     if url in shows:
         show_slug = slugify(url)
-        episode_file = f'episodes/{show_slug}.json'
+        episode_file = str(episodes_dir() / f'{show_slug}.json')
         try:
             if os.path.exists(episode_file):
                 os.remove(episode_file)

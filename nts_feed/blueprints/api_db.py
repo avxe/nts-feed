@@ -9,6 +9,7 @@ from datetime import datetime
 from flask import Blueprint, current_app, jsonify, request
 
 from ..ext.tasks import get_executor
+from ..runtime_paths import genre_taxonomy_cache_path
 from ..scrape import load_episodes, load_shows, save_episodes, slugify
 from .helpers import get_db, get_ext, get_lastfm
 
@@ -289,10 +290,9 @@ def api_taxonomy_build():
                 return jsonify({'success': True, 'started': False, 'message': 'Build already in progress'})
 
             if not force_rebuild:
-                from pathlib import Path
-                cache_path = Path('data/genre_taxonomy.json')
+                cache_path = genre_taxonomy_cache_path()
                 if cache_path.exists():
-                    taxonomy_service = GenreTaxonomyService(cache_dir='data/')
+                    taxonomy_service = GenreTaxonomyService(cache_dir=str(cache_path.parent))
                     taxonomy = taxonomy_service.get_taxonomy(force_rebuild=False)
                     return jsonify({
                         'success': True, 'started': False,
@@ -317,7 +317,7 @@ def api_taxonomy_build():
 
                 lastfm_service = get_lastfm()
                 taxonomy_service = GenreTaxonomyService(
-                    lastfm_service=lastfm_service, cache_dir='data/',
+                    lastfm_service=lastfm_service, cache_dir=str(genre_taxonomy_cache_path().parent),
                 )
                 if force_rebuild:
                     taxonomy_service.clear_cache()
@@ -376,8 +376,7 @@ def api_taxonomy_build_status():
 def api_taxonomy_status():
     """Get current taxonomy status."""
     try:
-        from pathlib import Path
-        cache_path = Path('data/genre_taxonomy.json')
+        cache_path = genre_taxonomy_cache_path()
         if not cache_path.exists():
             return jsonify({
                 'available': False,
@@ -409,13 +408,12 @@ def api_taxonomy_lookup(genre):
     """Look up a genre's family and similar genres."""
     try:
         from ..services.genre_taxonomy_service import GenreTaxonomyService
-        from pathlib import Path
 
-        cache_path = Path('data/genre_taxonomy.json')
+        cache_path = genre_taxonomy_cache_path()
         if not cache_path.exists():
             return jsonify({'error': 'Taxonomy not available. POST to /api/taxonomy/build first.'}), 404
 
-        taxonomy_service = GenreTaxonomyService(cache_dir='data/')
+        taxonomy_service = GenreTaxonomyService(cache_dir=str(cache_path.parent))
         family = taxonomy_service.get_genre_family(genre)
         similar = taxonomy_service.get_similar_genres(genre, min_similarity=0.2)
 
