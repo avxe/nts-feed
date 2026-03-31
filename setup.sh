@@ -280,6 +280,8 @@ echo ""
 if [ "$NONINTERACTIVE" -eq 1 ]; then
     dim "  Tip: setup.sh ran in non-interactive mode and used empty values for optional integrations."
 fi
+dim "  Tip: 'make quickstart' starts the production-style local stack with Gunicorn."
+dim "       Use 'make quickstart-dev' only when you want hot reload and debug mode."
 dim "  Tip: Run 'make docker-check' if Docker is installed but quickstart fails before build."
 dim "  Tip: Run 'docker compose logs -f web nginx' to watch startup progress."
 dim "  Tip: You can add or change API keys later by editing .env"

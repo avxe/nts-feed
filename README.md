@@ -15,7 +15,7 @@ NTS is great, but there's no built-in unified way to follow your fav DJs, save e
 
 ## Quick start (Docker)
 
-You'll need [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running. That's it.
+You'll need a Docker-compatible local runtime installed and running, such as [Docker Desktop](https://www.docker.com/products/docker-desktop/) or [OrbStack](https://orbstack.dev/).
 
 ```bash
 git clone https://github.com/avxe/nts-feed.git
@@ -23,7 +23,7 @@ cd nts-feed
 make quickstart
 ```
 
-`make quickstart` walks you through creating a `.env` file if one is missing, reuses your existing `.env` if it already exists, checks Docker/Compose/buildx, and then builds and starts everything.
+`make quickstart` walks you through creating a `.env` file if one is missing, reuses your existing `.env` if it already exists, checks Docker/Compose/buildx, and then starts the production-style local stack with Gunicorn behind nginx.
 
 Open [https://localhost](https://localhost) when it's ready. You'll see a self-signed certificate warning — that's normal for local HTTPS, just click through it.
 
@@ -34,6 +34,12 @@ make docker-check
 ```
 
 `make quickstart` also validates `.env`, repairs local runtime scaffolding such as `shows.json` and data directories, and fails early if ports `80` or `443` are already occupied.
+
+If you are actively developing on the app and want hot reload and Flask debug mode, use:
+
+```bash
+make quickstart-dev
+```
 
 To watch what's happening:
 
@@ -144,6 +150,7 @@ Everything lives in local files and a SQLite database — no external database s
 
 ```bash
 make help          # see all available commands
+make quickstart    # production-style local stack
 make docker-dev    # start in dev mode with hot reload
 make test          # run tests
 make lint          # check code style

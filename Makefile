@@ -1,5 +1,5 @@
-.PHONY: help setup ensure-env env-check runtime-bootstrap quickstart install install-dev test lint format clean \
-       docker-check docker-build docker-up docker-down docker-prod docker-dev docker-logs
+.PHONY: help setup ensure-env env-check runtime-bootstrap quickstart quickstart-dev install install-dev test lint format clean \
+       docker-check docker-check-dev docker-build docker-up docker-down docker-prod docker-dev docker-logs
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -25,7 +25,9 @@ env-check: ## Validate the current .env before startup
 runtime-bootstrap: ## Ensure local runtime files and directories exist
 	@bash ./scripts/bootstrap-runtime.sh
 
-quickstart: ensure-env env-check runtime-bootstrap docker-build docker-up ## Create .env if needed, validate it, then build and start containers
+quickstart: ensure-env env-check runtime-bootstrap docker-build docker-up ## Create .env if needed, validate it, then start the production-style local stack
+
+quickstart-dev: ensure-env env-check runtime-bootstrap docker-build docker-dev ## Create .env if needed, validate it, then start the hot-reload dev stack
 
 # ---------------------------------------------------------------------------
 # Local development
@@ -59,19 +61,21 @@ clean: ## Remove caches and build artifacts
 docker-check: ## Verify Docker, Compose/buildx, and the daemon are ready
 	@bash ./scripts/check-docker.sh
 
+docker-check-dev: ## Verify Docker prerequisites for the dev overlay
+	@bash ./scripts/check-docker.sh --dev
+
 docker-build: docker-check ## Build Docker image
 	docker compose build
 
-docker-up: env-check runtime-bootstrap docker-check ## Start tracked dev containers
-	docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+docker-up: env-check runtime-bootstrap docker-check ## Start the production-style local stack
+	docker compose -f docker-compose.yml up -d
 
 docker-down: ## Stop containers
 	docker compose down
 
-docker-prod: env-check runtime-bootstrap docker-check ## Start the production compose file only
-	docker compose -f docker-compose.yml up -d
+docker-prod: docker-up ## Alias for the production-style local stack
 
-docker-dev: env-check runtime-bootstrap docker-check ## Foreground tracked dev stack
+docker-dev: env-check runtime-bootstrap docker-check-dev ## Foreground dev stack with hot reload
 	docker compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 docker-logs: docker-check ## Tail container logs

@@ -5,6 +5,11 @@ set -euo pipefail
 DOCKER_BIN="${DOCKER_BIN:-docker}"
 ROOT_DIR="${NTS_FEED_ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
 REQUIRED_PORTS="${NTS_FEED_REQUIRED_PORTS-80 443}"
+COMPOSE_ARGS=(-f docker-compose.yml)
+
+if [ "${1:-}" = "--dev" ]; then
+    COMPOSE_ARGS+=(-f docker-compose.dev.yml)
+fi
 
 issues=()
 warnings=()
@@ -45,7 +50,7 @@ PY
 }
 
 project_nginx_running() {
-    "$DOCKER_BIN" compose -f docker-compose.yml -f docker-compose.dev.yml ps --services --status running 2>/dev/null | grep -qx 'nginx'
+    "$DOCKER_BIN" compose "${COMPOSE_ARGS[@]}" ps --services --status running 2>/dev/null | grep -qx 'nginx'
 }
 
 if ! command -v "$DOCKER_BIN" >/dev/null 2>&1; then
@@ -67,7 +72,7 @@ fi
 cd "$ROOT_DIR"
 
 if [ "${#issues[@]}" -eq 0 ]; then
-    if [ -f .env ] && ! "$DOCKER_BIN" compose -f docker-compose.yml -f docker-compose.dev.yml config >/dev/null 2>&1; then
+    if [ -f .env ] && ! "$DOCKER_BIN" compose "${COMPOSE_ARGS[@]}" config >/dev/null 2>&1; then
         add_issue "Docker Compose could not resolve the current configuration. Check .env values and compose file syntax."
     fi
 

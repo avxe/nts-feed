@@ -6,7 +6,7 @@ This document covers the supported ways to run NTS Feed locally.
 
 - Python 3.11 or 3.12 for source installs
 - `ffmpeg`
-- Docker with Compose support for containerized installs
+- A Docker-compatible runtime with Compose support for containerized installs, such as Docker Desktop or OrbStack
 
 ## Recommended: Docker
 
@@ -18,7 +18,7 @@ make quickstart
 
 Open [https://localhost](https://localhost).
 
-`make quickstart` creates `.env` when needed, reuses an existing `.env` without prompting again, validates the environment file, repairs local runtime scaffolding, checks Docker prerequisites, builds the image, and starts the tracked dev stack.
+`make quickstart` creates `.env` when needed, reuses an existing `.env` without prompting again, validates the environment file, repairs local runtime scaffolding, checks Docker prerequisites, builds the image, and starts the production-style local stack with Gunicorn behind nginx.
 
 If you want to manage setup and container startup separately:
 
@@ -26,6 +26,12 @@ If you want to manage setup and container startup separately:
 make setup
 make docker-build
 make docker-up
+```
+
+If you want hot reload and Flask debug mode for local development:
+
+```bash
+make quickstart-dev
 ```
 
 ### Verify startup
@@ -45,6 +51,7 @@ docker compose logs -f web nginx
 - local self-signed certs exist, or Docker can generate them later
 - Docker, Compose v2, `buildx`, and the daemon are available
 - ports `80` and `443` are free before nginx starts
+- the default startup path stays on the production-style app server instead of the Flask debug server
 
 ### Manual smoke test
 
@@ -118,6 +125,7 @@ python -m build --sdist --wheel
 
 - `Cannot connect to the Docker daemon`: start Docker, wait for it to finish booting, then rerun `make docker-check`.
 - `Docker Compose requires buildx plugin to be installed`: update Docker Desktop or install the Docker buildx plugin, then rerun `make docker-check`.
+- Seeing Flask debug logs on a fresh install: use `make quickstart`, not `make quickstart-dev` or `make docker-dev`.
 - `SECRET_KEY is missing or still set to a placeholder value`: rerun `make setup` or edit `.env`, then rerun your command.
 - `AUTO_ADD_DIR_HOST` or `MUSIC_DIR_HOST` still points at `/absolute/path/...`: remove those lines or replace them with real host paths before using Docker.
 - Port `80` or `443` already in use: change nginx host port mappings.
