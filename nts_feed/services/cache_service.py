@@ -53,7 +53,7 @@ class CacheService:
             'deletes': 0
         }
         
-        logger.info(f"Cache service initialized with directory: {self.cache_dir}")
+        logger.debug("Cache service initialized with directory: %s", self.cache_dir)
     
     def _get_cache_key(self, category: str, identifier: str) -> str:
         """
@@ -338,5 +338,4 @@ def with_cache(category: str, ttl: Optional[int] = None):
         
         return wrapper
     return decorator
-
 

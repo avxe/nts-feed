@@ -112,7 +112,7 @@ class UpdateService:
         self.progress_queues: Dict[str, queue.Queue] = {}
         self._lock = threading.Lock()
         
-        logger.info(f"UpdateService initialized with {max_workers} max workers")
+        logger.debug("UpdateService initialized with %s max workers", max_workers)
     
     def start_update(self, enable_auto_download: bool = True) -> str:
         """

@@ -108,7 +108,7 @@ class TrackManager:
             self._downloaded_episodes_cache = current_episodes
             self._last_scan_time = datetime.now()
 
-        logger.info("Directory scan complete")
+        logger.debug("Directory scan complete")
         return changes_made
 
     def is_episode_downloaded(self, episode_url):

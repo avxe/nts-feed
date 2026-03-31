@@ -269,15 +269,23 @@ def create_app():
                         return target
 
                     def _loop():
+                        announced_next_run = False
                         while True:
                             try:
                                 now_local = datetime.now(ZoneInfo(tz_name)) if ZoneInfo else datetime.now()
                                 next_run = _compute_next_run(now_local)
                                 sleep_sec = max(1, int((next_run - now_local).total_seconds()))
-                                app.logger.info(
-                                    'Next scheduled update at %s (%s); sleeping %ds',
-                                    next_run.isoformat(), tz_name, sleep_sec,
-                                )
+                                if not announced_next_run:
+                                    app.logger.info(
+                                        'Daily update scheduler enabled; next run at %s (%s)',
+                                        next_run.isoformat(), tz_name,
+                                    )
+                                    announced_next_run = True
+                                else:
+                                    app.logger.debug(
+                                        'Daily update scheduler waiting until %s (%s); sleeping %ds',
+                                        next_run.isoformat(), tz_name, sleep_sec,
+                                    )
                                 time.sleep(sleep_sec)
                                 update_service = app.extensions.get('update_service')
                                 if update_service is None:
