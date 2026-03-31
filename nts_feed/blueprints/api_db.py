@@ -120,6 +120,15 @@ def get_running_sync_job():
     return None
 
 
+def get_sync_job_info(job_id):
+    """Return a copy of sync job state for internal callers."""
+    with _sync_jobs_lock:
+        info = _sync_jobs.get(job_id)
+        if not info:
+            return None
+        return dict(info)
+
+
 # ---------------------------------------------------------------------------
 # DB Rebuild Routes
 # ---------------------------------------------------------------------------
@@ -252,14 +261,12 @@ def api_sync():
 def api_sync_status(job_id):
     """Get status of a sync job."""
     try:
-        with _sync_jobs_lock:
-            info = _sync_jobs.get(job_id)
-            if not info:
-                return jsonify({'success': False, 'message': 'Job not found'}), 404
-            out = dict(info)
-            if out.get('started_at'):
-                out['duration_ms'] = int(((out.get('ended_at') or time.time()) - out['started_at']) * 1000)
-            return jsonify({'success': True, 'job_id': job_id, 'info': out})
+        out = get_sync_job_info(job_id)
+        if not out:
+            return jsonify({'success': False, 'message': 'Job not found'}), 404
+        if out.get('started_at'):
+            out['duration_ms'] = int(((out.get('ended_at') or time.time()) - out['started_at']) * 1000)
+        return jsonify({'success': True, 'job_id': job_id, 'info': out})
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 

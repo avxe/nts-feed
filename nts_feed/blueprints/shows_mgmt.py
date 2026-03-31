@@ -5,6 +5,7 @@ import os
 import pathlib
 import queue
 import shutil
+import time
 from datetime import datetime
 
 from flask import Blueprint, Response, current_app, jsonify, redirect, request, url_for
@@ -29,6 +30,81 @@ bp = Blueprint('shows_mgmt', __name__)
 
 DOWNLOAD_DIR = pathlib.Path(os.path.dirname(os.path.abspath(__file__))).parent / 'downloads'
 DOWNLOAD_DIR.mkdir(exist_ok=True)
+
+SYNC_POLL_INTERVAL_SECONDS = 0.25
+SYNC_POLL_TIMEOUT_SECONDS = 120
+
+
+def _queue_sync_status(progress_queue, *, status, sync_job_id=None, phase=None, db_stats=None, error=None, message=None):
+    sync_payload = {'status': status}
+    if sync_job_id:
+        sync_payload['sync_job_id'] = sync_job_id
+    if phase:
+        sync_payload['phase'] = phase
+    if db_stats is not None:
+        sync_payload['db_stats'] = db_stats
+    if error:
+        sync_payload['error'] = error
+
+    progress_queue.put({
+        'type': 'sync_status',
+        'sync': sync_payload,
+        'message': message,
+    })
+
+
+def _wait_for_sync_completion(progress_queue, sync_job_id):
+    from .api_db import get_sync_job_info
+
+    deadline = time.monotonic() + SYNC_POLL_TIMEOUT_SECONDS
+    last_signature = None
+
+    while time.monotonic() < deadline:
+        sync_info = get_sync_job_info(sync_job_id)
+        if not sync_info:
+            _queue_sync_status(
+                progress_queue,
+                status='failed',
+                sync_job_id=sync_job_id,
+                error='Sync job disappeared before completion',
+                message='Database sync status was lost before it finished.',
+            )
+            return False
+
+        signature = (
+            sync_info.get('status'),
+            sync_info.get('phase'),
+            sync_info.get('error'),
+            repr(sync_info.get('db_stats')),
+        )
+        if signature != last_signature:
+            _queue_sync_status(
+                progress_queue,
+                status=sync_info.get('status', 'unknown'),
+                sync_job_id=sync_job_id,
+                phase=sync_info.get('phase'),
+                db_stats=sync_info.get('db_stats'),
+                error=sync_info.get('error'),
+                message='Syncing database...' if sync_info.get('status') == 'running' else None,
+            )
+            last_signature = signature
+
+        status = sync_info.get('status')
+        if status == 'completed':
+            return True
+        if status == 'failed':
+            return False
+
+        time.sleep(SYNC_POLL_INTERVAL_SECONDS)
+
+    _queue_sync_status(
+        progress_queue,
+        status='timed_out',
+        sync_job_id=sync_job_id,
+        error='Timed out waiting for database sync',
+        message='Database sync is still running. Try refreshing Discover in a moment.',
+    )
+    return False
 
 
 @bp.route('/subscribe_async', methods=['POST'])
@@ -61,9 +137,6 @@ def subscribe_async():
 
     image_cache_service = get_image_cache()
 
-    # Capture extensions for use in background thread (outside request context)
-    _app = current_app._get_current_object()
-
     def worker():
         try:
             shows = load_shows()
@@ -73,6 +146,9 @@ def subscribe_async():
                 return
 
             def on_progress(event):
+                event = dict(event)
+                if event.get('type') == 'completed':
+                    event['type'] = 'scrape_completed'
                 event['subscribe_id'] = subscribe_id
                 progress_queue.put(event)
 
@@ -126,24 +202,43 @@ def subscribe_async():
 
                 existing_sync = get_running_sync_job()
                 if existing_sync:
-                    progress_queue.put({
-                        'type': 'sync_status',
-                        'sync': {'status': 'already_running', 'sync_job_id': existing_sync},
-                        'message': 'Sync already in progress...',
-                    })
+                    _queue_sync_status(
+                        progress_queue,
+                        status='started',
+                        sync_job_id=existing_sync,
+                        message='Waiting for in-progress database sync...',
+                    )
+                    sync_job_id = existing_sync
                 else:
                     sync_job_id = start_sync_job(trigger='auto_subscribe')
+                    _queue_sync_status(
+                        progress_queue,
+                        status='started',
+                        sync_job_id=sync_job_id,
+                        message='Syncing database...',
+                    )
+
+                sync_completed = _wait_for_sync_completion(progress_queue, sync_job_id)
+                if not sync_completed:
                     progress_queue.put({
-                        'type': 'sync_status',
-                        'sync': {'status': 'started', 'sync_job_id': sync_job_id},
-                        'message': 'Syncing database...',
+                        'type': 'error',
+                        'message': 'Show was saved, but the database sync did not finish. Discover, stats, and admin may update after the next successful sync.',
                     })
+                    return
             except Exception as sync_err:
+                _queue_sync_status(
+                    progress_queue,
+                    status='failed',
+                    error=str(sync_err),
+                    message=f'Sync failed: {sync_err}',
+                )
                 progress_queue.put({
-                    'type': 'sync_status',
-                    'sync': {'status': 'failed', 'error': str(sync_err)},
-                    'message': f'Sync failed: {sync_err}',
+                    'type': 'error',
+                    'message': 'Show was saved, but the database sync failed. Discover, stats, and admin may update after the next successful sync.',
                 })
+                return
+
+            progress_queue.put({'type': 'completed', 'total': len(show_data['episodes'])})
 
         except Exception as e:
             progress_queue.put({'type': 'error', 'message': str(e)})

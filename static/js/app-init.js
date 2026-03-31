@@ -42,8 +42,21 @@
                         handlers.onProgress?.(data.current, data.total, data.episode_title);
                     } else if (data.type === 'saved') {
                         handlers.onSaved?.(data.total);
-                    } else if (data.type === 'sync_started') {
-                        handlers.onSyncStarted?.(data.sync_job_id);
+                    } else if (data.type === 'sync_status' || data.type === 'sync_started') {
+                        const sync = data.sync || {};
+                        const syncStatus = sync.status || data.status;
+                        if (syncStatus === 'failed' || syncStatus === 'timed_out') {
+                            finished = true;
+                            handlers.onError?.(
+                                data.message
+                                || sync.error
+                                || 'Database sync failed',
+                            );
+                            evt.close();
+                            reject(new Error(sync.error || 'Database sync failed'));
+                        } else {
+                            handlers.onSyncStarted?.(sync.sync_job_id || data.sync_job_id, syncStatus);
+                        }
                     } else if (data.type === 'completed') {
                         finished = true;
                         handlers.onCompleted?.(data.total);
@@ -121,8 +134,13 @@
                     if (barFill) barFill.style.width = '100%';
                     if (countEl) countEl.textContent = `${total} / ${total}`;
                 },
-                onSyncStarted: () => {
-                    if (statusEl) statusEl.textContent = 'Syncing database...';
+                onSyncStarted: (_jobId, syncStatus) => {
+                    if (!statusEl) return;
+                    if (syncStatus === 'completed') {
+                        statusEl.textContent = 'Database sync complete';
+                    } else {
+                        statusEl.textContent = 'Syncing database...';
+                    }
                 },
                 onCompleted: (total) => {
                     if (statusEl) statusEl.textContent = `Done. Added ${total} episodes`;
