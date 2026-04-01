@@ -73,9 +73,10 @@ def create_app():
     if not app.secret_key:
         raise RuntimeError('SECRET_KEY environment variable must be set')
 
+    force_https = os.getenv('FORCE_HTTPS', 'false').lower() == 'true'
     app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
-    app.config['SESSION_COOKIE_SECURE'] = True
-    app.config['PREFERRED_URL_SCHEME'] = 'https'
+    app.config['SESSION_COOKIE_SECURE'] = force_https
+    app.config['PREFERRED_URL_SCHEME'] = 'https' if force_https else 'http'
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1)
 
     # ------------------------------------------------------------------
@@ -117,7 +118,6 @@ def create_app():
             ],
             'connect-src': ["'self'", 'https:'],
         }
-        force_https = os.getenv('FORCE_HTTPS', 'false').lower() == 'true'
         permissions_policy = {
             'geolocation': '()', 'microphone': '()', 'camera': '()',
             'payment': '()', 'usb': '()',
@@ -128,7 +128,7 @@ def create_app():
                 content_security_policy_nonce_in=['script-src'],
                 permissions_policy=permissions_policy,
                 force_https=force_https,
-                session_cookie_secure=True, session_cookie_samesite='Lax',
+                session_cookie_secure=force_https, session_cookie_samesite='Lax',
                 frame_options='SAMEORIGIN',
             )
         else:
