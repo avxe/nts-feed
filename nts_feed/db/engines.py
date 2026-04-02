@@ -38,12 +38,11 @@ def get_db_engine(database_url: str | None = None):
         def set_sqlite_pragma(dbapi_connection, connection_record):  # noqa: N802, ARG001
             cursor = dbapi_connection.cursor()
             pragmas = [
-                ('journal_mode', 'WAL'),
+                ('journal_mode', 'DELETE'),
                 ('busy_timeout', '120000'),
                 ('foreign_keys', 'ON'),
                 ('synchronous', 'NORMAL'),
                 ('cache_size', '-65536'),
-                ('mmap_size', '268435456'),
                 ('temp_store', 'MEMORY'),
                 ('page_size', '4096'),
                 ('auto_vacuum', 'INCREMENTAL'),
@@ -99,7 +98,6 @@ def get_optimized_bulk_engine(database_url: str | None = None):
             ('synchronous', 'OFF'),
             ('cache_size', '-131072'),
             ('temp_store', 'MEMORY'),
-            ('mmap_size', '536870912'),
             ('locking_mode', 'EXCLUSIVE'),
         ]:
             try:

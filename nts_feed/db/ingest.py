@@ -266,7 +266,6 @@ def _optimize_sqlite_for_bulk(session) -> None:
         conn.execute(text("PRAGMA journal_mode = MEMORY"))
         conn.execute(text("PRAGMA temp_store = MEMORY"))
         conn.execute(text("PRAGMA cache_size = -64000"))  # 64MB cache
-        conn.execute(text("PRAGMA mmap_size = 268435456"))  # 256MB mmap
     except Exception as e:
         logger.warning(f"Could not set bulk SQLite pragmas: {e}")
 
@@ -276,7 +275,7 @@ def _restore_sqlite_settings(session) -> None:
     try:
         conn = session.connection()
         conn.execute(text("PRAGMA synchronous = NORMAL"))
-        conn.execute(text("PRAGMA journal_mode = WAL"))
+        conn.execute(text("PRAGMA journal_mode = DELETE"))
     except Exception as e:
         logger.warning(f"Could not restore SQLite pragmas: {e}")
 
