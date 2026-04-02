@@ -1485,6 +1485,12 @@ async function initShowPageCore(options = {}) {
     const infiniteScrollController = initEpisodesInfiniteScroll();
     showPageCleanupResources.infiniteScrollObserver = infiniteScrollController?.observer || null;
 
+    // Poll for pending episodes (tracklists backfilling in background)
+    const pendingLoader = document.getElementById('pendingEpisodesLoader');
+    if (pendingLoader) {
+        initPendingEpisodesPoll(pendingLoader, infiniteScrollController);
+    }
+
     // Handle #ep=<encoded episode url> fragment - MUST be after initEpisodesInfiniteScroll
     // so the IntersectionObserver is already set up when we try to trigger it
     (async () => {
@@ -1734,6 +1740,61 @@ function handleBatchProgress(progress, downloadButtons) {
 }
 
 // Infinite scrolling for episodes list - now a function called from initShowPageCore
+/**
+ * Poll the episodes API to detect newly backfilled episodes and append them.
+ * Runs every few seconds while there are pending episodes, then removes the loader.
+ */
+function initPendingEpisodesPoll(loaderEl, scrollController) {
+    const showUrl = loaderEl.dataset.showUrl;
+    let lastKnownTotal = parseInt(document.getElementById('episodesList')?.dataset.total || '0', 10);
+    const POLL_INTERVAL = 5000;
+    let pollTimer = null;
+
+    async function poll() {
+        try {
+            const res = await fetch(`/api/show/${encodeURIComponent(showUrl)}/episodes?page=1&per_page=1`);
+            const data = await res.json();
+            if (!data.success) return;
+
+            const newTotal = data.total || 0;
+            const pending = data.pending_episodes || 0;
+
+            if (newTotal > lastKnownTotal) {
+                // Update the total so infinite scroll knows there are more
+                const episodesList = document.getElementById('episodesList');
+                if (episodesList) {
+                    episodesList.dataset.total = String(newTotal);
+                }
+                lastKnownTotal = newTotal;
+
+                // Trigger a load of the next page to pick up new episodes
+                if (scrollController?.loadNextPage) {
+                    await scrollController.loadNextPage();
+                }
+            }
+
+            // Update loader text
+            if (pending > 0) {
+                const span = loaderEl.querySelector('span');
+                if (span) span.textContent = `Loading ${pending} more episode${pending !== 1 ? 's' : ''}…`;
+            } else {
+                // All done — remove loader
+                loaderEl.remove();
+                if (pollTimer) clearInterval(pollTimer);
+            }
+        } catch (e) {
+            console.warn('[ShowPage] Pending episodes poll error:', e);
+        }
+    }
+
+    pollTimer = setInterval(poll, POLL_INTERVAL);
+    // Store for cleanup
+    if (window._showPageCleanup) {
+        const origCleanup = window._showPageCleanup;
+        window._showPageCleanup = () => { clearInterval(pollTimer); origCleanup(); };
+    }
+}
+
 function initEpisodesInfiniteScroll() {
     const episodesList = document.getElementById('episodesList');
     const sentinel = document.getElementById('loadMoreTrigger');

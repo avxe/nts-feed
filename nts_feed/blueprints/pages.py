@@ -132,10 +132,15 @@ def show(url):
 
     per_page = 20
     all_episodes = episodes_data.get('episodes', [])
-    total_episodes = len(all_episodes)
-    first_page_episodes = all_episodes[:per_page]
+    total_episodes_stored = len(all_episodes)
 
-    new_episodes = sum(1 for ep in all_episodes if ep.get('is_new', False))
+    # Only show episodes that have tracklists loaded; count pending ones
+    ready_episodes = [ep for ep in all_episodes if ep.get('tracklist')]
+    pending_episodes = total_episodes_stored - len(ready_episodes)
+    total_episodes = len(ready_episodes)
+    first_page_episodes = ready_episodes[:per_page]
+
+    new_episodes = sum(1 for ep in ready_episodes if ep.get('is_new', False))
     show_data['new_episodes'] = new_episodes
 
     if 'auto_download' not in show_data:
@@ -147,6 +152,8 @@ def show(url):
 
     show_data['episodes'] = first_page_episodes
     show_data['total_episodes'] = total_episodes
+    show_data['total_episodes_stored'] = total_episodes_stored
+    show_data['pending_episodes'] = pending_episodes
     show_data['per_page'] = per_page
 
     try:

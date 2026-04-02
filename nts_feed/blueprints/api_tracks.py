@@ -112,10 +112,14 @@ def api_show_episodes(url):
         show_slug = slugify(url)
         episodes_data = load_episodes(show_slug)
         all_episodes = episodes_data.get('episodes', [])
-        total = len(all_episodes)
+
+        # Only serve episodes that have tracklists loaded
+        ready_episodes = [ep for ep in all_episodes if ep.get('tracklist')]
+        pending = len(all_episodes) - len(ready_episodes)
+        total = len(ready_episodes)
 
         start = (page - 1) * per_page
-        page_episodes = all_episodes[start:start + per_page]
+        page_episodes = ready_episodes[start:start + per_page]
 
         track_manager = get_track_manager()
         downloaded_episodes = {
@@ -130,6 +134,7 @@ def api_show_episodes(url):
             'episodes': [_serialize_episode(ep) for ep in page_episodes],
             'page': page, 'per_page': per_page, 'total': total,
             'has_more': (start + per_page) < total,
+            'pending_episodes': pending,
         })
     except Exception:
         current_app.logger.exception('Episodes pagination failed')
