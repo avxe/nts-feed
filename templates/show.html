@@ -63,12 +63,6 @@
         {% endwith %}
         {% endfor %}
     </div>
-    {% if show_data.pending_episodes > 0 %}
-    <div id="pendingEpisodesLoader" class="pending-episodes-loader" data-pending="{{ show_data.pending_episodes }}" data-show-url="{{ show_url }}">
-        <div class="loading-spinner"></div>
-        <span>Loading {{ show_data.pending_episodes }} more episode{{ 's' if show_data.pending_episodes != 1 else '' }}…</span>
-    </div>
-    {% endif %}
     <div id="loadMoreTrigger" class="load-more-trigger" aria-hidden="true"></div>
 </div>
 {% endblock %}

@@ -170,7 +170,7 @@ def scrape_nts_show(url):
     finally:
         session.close()
 
-def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False, immediate_tracklist_count=10):
+def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False):
     """Scrape NTS show with concurrent episode fetching and progress callbacks.
 
     Args:
@@ -180,10 +180,6 @@ def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False, imme
             { 'type': 'progress', 'current': int, 'total': int, 'episode_title': str }
             { 'type': 'completed', 'total': int }
         defer_tracklists: If True, skip fetching tracklists (they load on-demand later).
-            This makes subscription near-instant.
-        immediate_tracklist_count: When defer_tracklists is True, fetch tracklists for
-            this many episodes immediately (most recent first). Remaining episodes get
-            tracklists backfilled in the background.
 
     Returns:
         dict with keys: title, description, thumbnail, episodes
@@ -341,40 +337,9 @@ def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False, imme
         parsed_episodes = [parse_episode_metadata(ep) for ep in episode_metadata]
 
         if defer_tracklists:
-            # Hybrid mode: Fetch tracklists for first N episodes, defer the rest
-            immediate = parsed_episodes[:immediate_tracklist_count]
-            deferred = parsed_episodes[immediate_tracklist_count:]
-
-            # Fetch tracklists for first batch concurrently
-            if immediate:
-                imm_results = [None] * len(immediate)
-                with ThreadPoolExecutor(max_workers=min(EPISODE_FETCH_WORKERS, len(immediate))) as executor:
-                    future_to_idx = {
-                        executor.submit(fetch_episode_with_tracklist, ep_info, i): i
-                        for i, ep_info in enumerate(immediate)
-                    }
-                    for future in as_completed(future_to_idx):
-                        try:
-                            idx, episode = future.result()
-                            imm_results[idx] = episode
-                        except Exception:
-                            idx = future_to_idx[future]
-                            ep_info = immediate[idx]
-                            imm_results[idx] = {
-                                'title': ep_info['title'],
-                                'date': ep_info['date'],
-                                'audio_url': ep_info['episode_url'],
-                                'genres': [],
-                                'tracklist': [],
-                                'image_url': ep_info['image_url'],
-                                'url': ep_info['episode_url'],
-                                'is_new': True,
-                            }
-                episodes.extend(ep for ep in imm_results if ep is not None)
-
-            # Add deferred episodes with empty tracklists
-            for i, ep_info in enumerate(deferred):
-                episodes.append({
+            # Fast mode: Skip tracklist fetching, just use metadata
+            for i, ep_info in enumerate(parsed_episodes):
+                episode = {
                     'title': ep_info['title'],
                     'date': ep_info['date'],
                     'audio_url': ep_info['episode_url'],
@@ -382,14 +347,15 @@ def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False, imme
                     'tracklist': [],
                     'image_url': ep_info['image_url'],
                     'url': ep_info['episode_url'],
-                    'is_new': True,
-                })
+                    'is_new': True
+                }
+                episodes.append(episode)
                 if callable(on_progress):
                     on_progress({
                         'type': 'progress',
-                        'current': len(immediate) + i + 1,
+                        'current': i + 1,
                         'total': len(parsed_episodes),
-                        'episode_title': ep_info['title'],
+                        'episode_title': episode['title']
                     })
         else:
             # Concurrent mode: Fetch all episode pages in parallel

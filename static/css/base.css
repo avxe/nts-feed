@@ -12,22 +12,6 @@
 /* Sentinel element for IntersectionObserver-based infinite scroll */
 .load-more-trigger { height: 1px; }
 
-/* Pending episodes loader — shown while tracklists backfill in background */
-.pending-episodes-loader {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    padding: 24px;
-    color: var(--color-text-secondary);
-    font-size: 0.9rem;
-}
-.pending-episodes-loader .loading-spinner {
-    width: 18px;
-    height: 18px;
-    display: inline-block;
-}
-
 /* Progress bar initial state */
 .progress-fill--zero { width: 0%; }
 
