@@ -126,7 +126,13 @@ def _post_subscribe_tasks(app, shows, url, show_data, image_cache_service):
             except Exception:
                 pass
 
-            # Auto-trigger DB sync
+            # Backfill tracklists in background (deferred during subscribe)
+            try:
+                backfill_tracklists_for_show(url)
+            except Exception:
+                pass
+
+            # Auto-trigger DB sync after backfill so tracklists are indexed
             try:
                 from .api_db import get_running_sync_job, start_sync_job
 
@@ -152,13 +158,19 @@ def subscribe_async():
     except ValidationError as e:
         return jsonify({'success': False, 'message': e.message, 'field': e.field}), 400
 
+    # Defer tracklists by default for fast subscriptions — tracklists are
+    # fetched on-demand when the user opens an episode, and backfilled in
+    # the background after subscribe completes.
     defer_tracklists_raw = (
         request.form.get('defer_tracklists')
         or request.form.get('fast')
         or json_data.get('defer_tracklists')
         or json_data.get('fast')
     )
-    defer_tracklists = str(defer_tracklists_raw).lower() in ('true', '1', 'yes')
+    if defer_tracklists_raw is not None:
+        defer_tracklists = str(defer_tracklists_raw).lower() not in ('false', '0', 'no')
+    else:
+        defer_tracklists = True
 
     subscribe_id = datetime.now().strftime('%Y%m%d_%H%M%S%f')
     progress_queue = queue.Queue()
