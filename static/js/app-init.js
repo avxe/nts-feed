@@ -22,7 +22,7 @@
                 <div class="count" style="font-size:0.9rem; color:var(--color-text-secondary)"></div>
             </div>
             <div class="bar" style="height:6px; background:var(--color-surface-alt); border-radius:4px; overflow:hidden;">
-                <div class="bar-fill" style="height:100%; width:0%; background:var(--color-primary); transition:width .25s ease;"></div>
+                <div class="bar-fill" style="height:100%; width:0%; background:var(--color-text-primary); transition:width .25s ease;"></div>
             </div>
         `;
         body.appendChild(container);

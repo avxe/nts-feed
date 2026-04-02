@@ -21,7 +21,6 @@ class SubscribeFlowTest(unittest.TestCase):
         self.app.register_blueprint(shows_mgmt_bp)
         self.client = self.app.test_client()
 
-    @patch("nts_feed.blueprints.shows_mgmt.time.sleep", return_value=None)
     @patch("nts_feed.blueprints.shows_mgmt.get_executor", return_value=_ImmediateExecutor())
     @patch("nts_feed.blueprints.shows_mgmt.get_image_cache", return_value=None)
     @patch("nts_feed.blueprints.shows_mgmt.save_episodes")
@@ -30,10 +29,8 @@ class SubscribeFlowTest(unittest.TestCase):
     @patch("nts_feed.blueprints.shows_mgmt.scrape_nts_show_progress")
     @patch("nts_feed.blueprints.api_db.get_running_sync_job", return_value=None)
     @patch("nts_feed.blueprints.api_db.start_sync_job", return_value="sync-job-1")
-    @patch("nts_feed.blueprints.api_db.get_sync_job_info")
-    def test_subscribe_async_waits_for_sync_completion_before_stream_finishes(
+    def test_subscribe_async_completes_immediately_after_save(
         self,
-        mock_get_sync_job_info,
         _mock_start_sync_job,
         _mock_get_running_sync_job,
         _mock_scrape,
@@ -42,7 +39,6 @@ class SubscribeFlowTest(unittest.TestCase):
         _mock_save_episodes,
         _mock_get_image_cache,
         _mock_get_executor,
-        _mock_sleep,
     ):
         def _fake_scrape(_url, *, on_progress=None, defer_tracklists=False):
             del defer_tracklists
@@ -73,14 +69,6 @@ class SubscribeFlowTest(unittest.TestCase):
             }
 
         _mock_scrape.side_effect = _fake_scrape
-        mock_get_sync_job_info.side_effect = [
-            {"status": "running", "phase": "rebuilding_database"},
-            {
-                "status": "completed",
-                "phase": "completed",
-                "db_stats": {"shows": 1, "episodes": 1},
-            },
-        ]
 
         response = self.client.post(
             "/subscribe_async",
@@ -99,17 +87,22 @@ class SubscribeFlowTest(unittest.TestCase):
                 break
             events.append(item)
 
-        sync_events = [event for event in events if event.get("type") == "sync_status"]
-        completed_events = [event for event in events if event.get("type") == "completed"]
-        self.assertGreaterEqual(len(sync_events), 2)
-        self.assertEqual(sync_events[0]["sync"]["status"], "started")
-        self.assertEqual(sync_events[-1]["sync"]["status"], "completed")
-        self.assertEqual(sync_events[-1]["sync"]["db_stats"], {"shows": 1, "episodes": 1})
-        self.assertEqual(len(completed_events), 1)
-        self.assertEqual(events[-2]["type"], "sync_status")
-        self.assertEqual(events[-2]["sync"]["status"], "completed")
+        event_types = [e.get("type") for e in events]
+
+        # Saved event should appear before completed
+        self.assertIn("saved", event_types)
+        self.assertIn("completed", event_types)
+        saved_idx = event_types.index("saved")
+        completed_idx = event_types.index("completed")
+        self.assertLess(saved_idx, completed_idx)
+
+        # Completed should be the last event (before sentinel None)
         self.assertEqual(events[-1]["type"], "completed")
         self.assertEqual(events[-1]["total"], 1)
+
+        # DB sync should have been triggered in background
+        _mock_start_sync_job.assert_called_once_with(trigger="auto_subscribe")
+
 
 
 if __name__ == "__main__":

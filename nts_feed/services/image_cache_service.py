@@ -19,8 +19,12 @@ class ImageCacheService:
 
     - Caches by MD5 of the source URL
     - Validates content type is image/*
+    - Negative cache for failed fetches (avoids repeated retries)
     - Optional simple host allowlist via IMAGE_CACHE_ALLOWED_HOSTS (comma-separated)
     """
+
+    # How long to remember a failed fetch before retrying (seconds)
+    NEGATIVE_CACHE_TTL = 3600  # 1 hour
 
     def __init__(self, cache_dir: str | None = None):
         # Resolve to absolute path to ensure Flask send_file works correctly
@@ -37,6 +41,10 @@ class ImageCacheService:
         # Request headers: user-agent and referer to reduce remote blocks
         self.user_agent = os.getenv("IMAGE_CACHE_USER_AGENT", "Mozilla/5.0 (NTSFeed)")
         self.default_referer = os.getenv("IMAGE_CACHE_REFERER", "")
+
+        # Negative cache: track URLs that failed to avoid repeated retries
+        # Maps URL hash -> timestamp of failure
+        self._negative_cache: dict[str, float] = {}
 
     @staticmethod
     def _hash_url(url: str) -> str:
@@ -144,11 +152,33 @@ class ImageCacheService:
             logger.error("ImageCacheService: failed to fetch %s: %s", url, e)
             return None
 
+    def _is_negatively_cached(self, url: str) -> bool:
+        """Check if a URL recently failed and should not be retried yet."""
+        import time
+        key = self._hash_url(url)
+        failed_at = self._negative_cache.get(key)
+        if failed_at is None:
+            return False
+        if time.time() - failed_at > self.NEGATIVE_CACHE_TTL:
+            del self._negative_cache[key]
+            return False
+        return True
+
+    def _mark_negative(self, url: str) -> None:
+        """Record that a fetch failed so we skip retries for a while."""
+        import time
+        self._negative_cache[self._hash_url(url)] = time.time()
+
     def get_or_fetch(self, url: str) -> Optional[Path]:
         cached = self.get_cached_path(url)
         if cached:
             return cached
-        return self.fetch_and_cache(url)
+        if self._is_negatively_cached(url):
+            return None
+        result = self.fetch_and_cache(url)
+        if result is None:
+            self._mark_negative(url)
+        return result
 
     def prefetch_many(self, urls, concurrency: int = 8, force: bool = False):
         """
