@@ -23,5 +23,5 @@ def test_env_example_uses_storage_root_defaults() -> None:
     env_example = (REPO_ROOT / "env.example").read_text(encoding="utf-8")
 
     assert "NTS_STORAGE_ROOT=storage" in env_example
-    assert "DATABASE_URL=sqlite:///storage/data/nts.db" in env_example
+    assert "DATABASE_URL=sqlite:///storage/data/nts.db" in env_example  # pragma: allowlist secret
     assert "IMAGE_CACHE_DIR=storage/thumbnails" in env_example

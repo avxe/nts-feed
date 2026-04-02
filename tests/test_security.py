@@ -257,10 +257,14 @@ class TestSessionCookieSecurity(unittest.TestCase):
         self.assertEqual(self.app.config.get('SESSION_COOKIE_SAMESITE'), 'Lax')
 
     def test_session_cookie_secure(self):
-        self.assertEqual(self.app.config.get('SESSION_COOKIE_SECURE'), True)
+        # SESSION_COOKIE_SECURE follows FORCE_HTTPS; when not set it defaults to False
+        force_https = os.environ.get('FORCE_HTTPS', 'false').lower() == 'true'
+        self.assertEqual(self.app.config.get('SESSION_COOKIE_SECURE'), force_https)
 
     def test_preferred_url_scheme(self):
-        self.assertEqual(self.app.config.get('PREFERRED_URL_SCHEME'), 'https')
+        force_https = os.environ.get('FORCE_HTTPS', 'false').lower() == 'true'
+        expected = 'https' if force_https else 'http'
+        self.assertEqual(self.app.config.get('PREFERRED_URL_SCHEME'), expected)
 
 
 if __name__ == '__main__':

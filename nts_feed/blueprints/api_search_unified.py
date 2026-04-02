@@ -70,7 +70,7 @@ def _ranked_ids(session, sql, params, limit):
 
 
 def _search_tracks(session, query: str, limit: int):
-    from ..db.models import Artist, Episode, EpisodeTrack, Show, Track, track_artists
+    from ..db.models import Episode, EpisodeTrack, Show, Track
 
     patterns = _match_patterns(query)
 
@@ -89,10 +89,36 @@ def _search_tracks(session, query: str, limit: int):
         FROM track_artists ta JOIN artists a ON a.id = ta.artist_id
         WHERE lower(a.name) LIKE :contains ESCAPE '\\'
     """
-    track_ids = _ranked_ids(session, sql, {
+    params = {
         'prefix': patterns['prefix'],
         'contains': patterns['contains'],
-    }, limit)
+    }
+
+    # Multi-token search: if the query has multiple words, add a cross-field
+    # match that finds tracks where every token appears in either the title
+    # or an associated artist name.
+    tokens = query.strip().lower().split()
+    if len(tokens) > 1:
+        token_clauses = []
+        for i, token in enumerate(tokens):
+            tok_esc = escape_like(token)
+            pkey = f'mt{i}'
+            params[pkey] = f'%{tok_esc}%'
+            token_clauses.append(
+                f"(lower(t.title_norm) LIKE :{pkey} ESCAPE '\\'"
+                f" OR EXISTS (SELECT 1 FROM track_artists ta2"
+                f" JOIN artists a2 ON a2.id = ta2.artist_id"
+                f" WHERE ta2.track_id = t.id"
+                f" AND lower(a2.name) LIKE :{pkey} ESCAPE '\\'))"
+            )
+        multi_where = " AND ".join(token_clauses)
+        sql += f"""
+      UNION ALL
+        SELECT t.id, 2 as rank FROM tracks t
+        WHERE {multi_where}
+        """
+
+    track_ids = _ranked_ids(session, sql, params, limit)
 
     if not track_ids:
         return []
@@ -246,7 +272,6 @@ def _search_artists(session, query: str, limit: int):
     from ..db.models import Artist, Track
 
     patterns = _match_patterns(query)
-    name_lower = Artist.name
 
     sql = """
         SELECT id, 1 as rank FROM artists
