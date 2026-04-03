@@ -87,6 +87,13 @@ body {
     line-height: 1.5;
 }
 
+/* Mobile: add bottom padding for bottom tab bar + safe area */
+@media (max-width: 767px) {
+    body {
+        padding-bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+    }
+}
+
 a {
     color: var(--color-text-primary);
     text-decoration: none;

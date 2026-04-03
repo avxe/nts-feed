@@ -466,9 +466,50 @@
         right: calc(var(--spacing-base) * -1);
         min-width: 180px;
     }
-    
+
     .show-menu-trigger {
         opacity: 1;
         transform: scale(1);
     }
-} 
+}
+
+/* Touch devices: always show menu trigger */
+@media (hover: none) {
+    .show-menu-trigger {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .show-menu-item {
+        min-height: var(--touch-target-min);
+    }
+}
+
+/* Mobile show list polish */
+@media (max-width: 767px) {
+    .show-stats {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: var(--space-xs);
+    }
+
+    .new-badge,
+    .auto-download-badge {
+        font-size: 0.7rem;
+        padding: 0.15rem 0.4rem;
+        margin-left: 0;
+    }
+
+    .episode-count {
+        font-size: 0.8em;
+    }
+
+    .index-controls {
+        gap: var(--space-sm);
+    }
+
+    .sort-dropdown {
+        font-size: 0.8em;
+        min-width: 120px;
+    }
+}

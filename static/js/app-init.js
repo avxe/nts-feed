@@ -242,9 +242,27 @@
         window.closeSubscribeModal = closeModal;
     }
     
+    // Highlight active nav tab (top + bottom) based on current URL
+    function updateActiveNav() {
+        var path = window.location.pathname;
+        document.querySelectorAll('.global-nav-link, .bottom-tab').forEach(function(link) {
+            var href = link.getAttribute('href');
+            if (!href) return;
+            var isActive = (href === '/' && path === '/') ||
+                           (href !== '/' && path.startsWith(href));
+            link.classList.toggle('active', isActive);
+            if (isActive) {
+                link.setAttribute('aria-current', 'page');
+            } else {
+                link.removeAttribute('aria-current');
+            }
+        });
+    }
+
     function initApp() {
         // Initialize global subscribe modal handlers (works on all pages)
         initGlobalSubscribeModal();
+        updateActiveNav();
 
         if (window.GlobalSearch && typeof window.GlobalSearch.init === 'function') {
             window.GlobalSearch.init();
@@ -272,4 +290,5 @@
     }
     
     document.addEventListener('spa:pagechange', initGlobalSubscribeModal);
+    document.addEventListener('spa:pagechange', updateActiveNav);
 })();

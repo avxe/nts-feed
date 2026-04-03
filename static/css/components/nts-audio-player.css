@@ -474,6 +474,104 @@
     }
 }
 
+/* ====================================
+   Mobile Audio Player
+======================================= */
+@media (max-width: 767px) {
+    .nts-audio-player {
+        /* Sit above the bottom tab bar */
+        bottom: calc(var(--bottom-nav-height) + var(--safe-area-bottom));
+        height: 64px;
+    }
+
+    .nts-audio-player-header {
+        height: 64px;
+        padding: 0 var(--space-sm);
+        gap: var(--space-sm);
+    }
+
+    .nts-audio-player-thumbnail {
+        width: 48px;
+        height: 48px;
+        margin-right: var(--space-sm);
+        border-radius: var(--border-radius-md);
+    }
+
+    .nts-audio-player-info {
+        flex: 1;
+        max-width: none;
+        width: auto;
+        margin-right: var(--space-sm);
+    }
+
+    .nts-audio-player-title {
+        font-size: 0.85rem;
+    }
+
+    .nts-audio-player-channel {
+        font-size: 0.7rem;
+    }
+
+    /* Center controls: simplified on mobile */
+    .nts-audio-player-center-controls {
+        position: static;
+        width: auto;
+        max-width: none;
+        flex: 0 0 auto;
+        flex-direction: row;
+        padding: 0;
+        gap: 0;
+        pointer-events: auto;
+    }
+
+    .nts-audio-player-main-controls {
+        gap: var(--space-xs);
+        margin-bottom: 0;
+    }
+
+    .nts-audio-player-prev,
+    .nts-audio-player-next {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
+
+    .nts-audio-player-play-pause {
+        width: 44px;
+        height: 44px;
+        font-size: 1.4rem;
+    }
+
+    /* Hide progress bar from header on mobile — it's too small to interact with */
+    .nts-audio-player-progress-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        margin: 0;
+        border-radius: 0;
+    }
+
+    /* Hide non-essential controls */
+    .nts-audio-player-time,
+    .nts-audio-player-volume-container,
+    .nts-audio-player-platform {
+        display: none;
+    }
+
+    .nts-audio-player-controls {
+        width: auto;
+        gap: var(--space-xs);
+    }
+
+    .nts-audio-player-like,
+    .nts-audio-player-close {
+        padding: 8px !important;
+        font-size: 1rem;
+    }
+}
+
 /* Pulse animation for auto-play hint */
 @keyframes pulse {
     0% {

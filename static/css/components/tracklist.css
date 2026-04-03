@@ -385,3 +385,33 @@
     50% { transform: scale(1.3); }
     100% { transform: scale(1); }
 }
+
+/* ====================================
+   Touch Devices — Always show track action buttons
+======================================= */
+@media (hover: none) {
+    .track-info-btn,
+    .track-download-btn,
+    .track-youtube-btn,
+    .track-like-btn {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .track-timestamp {
+        opacity: 1;
+    }
+
+    .track-item {
+        padding: 6px 4px;
+        gap: 6px;
+    }
+
+    .track-info-btn,
+    .track-download-btn,
+    .track-youtube-btn,
+    .track-like-btn {
+        width: 32px;
+        height: 32px;
+    }
+}
