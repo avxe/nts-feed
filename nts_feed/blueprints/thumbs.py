@@ -35,10 +35,9 @@ def cached_thumbnail():
             mimetype = 'image/gif'
         
         # Use conditional=True to enable 304 responses
-        # Cache-Control tells browsers to cache for 1 year
-        # nginx proxy_cache (configured for 7 days) will cache the full response
+        # Cache-Control is set by nginx (proxy_ignore_headers + add_header)
+        # to avoid duplicate headers; Flask just serves the file
         resp = send_file(str(cached_path), mimetype=mimetype, conditional=True)
-        resp.headers['Cache-Control'] = 'public, max-age=31536000, immutable'
         return resp
         
     except Exception as e:

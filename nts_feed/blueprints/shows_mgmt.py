@@ -107,6 +107,38 @@ def _wait_for_sync_completion(progress_queue, sync_job_id):
     return False
 
 
+def _post_subscribe_tasks(app, shows, url, show_data, image_cache_service):
+    """Run thumbnail prefetch and DB sync in background after subscribe completes."""
+    def _run():
+        with app.app_context():
+            # Warm thumbnail cache
+            try:
+                urls_to_prefetch = []
+                show_thumb = shows[url].get('thumbnail')
+                if show_thumb:
+                    urls_to_prefetch.append(show_thumb)
+                for ep in show_data.get('episodes', [])[:200]:
+                    thumb = ep.get('image_url')
+                    if thumb:
+                        urls_to_prefetch.append(thumb)
+                if urls_to_prefetch and image_cache_service:
+                    image_cache_service.prefetch_many(urls_to_prefetch, concurrency=8)
+            except Exception:
+                pass
+
+            # Auto-trigger DB sync
+            try:
+                from .api_db import get_running_sync_job, start_sync_job
+
+                existing_sync = get_running_sync_job()
+                if not existing_sync:
+                    start_sync_job(trigger='auto_subscribe')
+            except Exception:
+                pass
+
+    get_executor().submit(_run)
+
+
 @bp.route('/subscribe_async', methods=['POST'])
 def subscribe_async():
     """Start background subscription for a show and stream progress via SSE."""
@@ -183,64 +215,11 @@ def subscribe_async():
                 save_episodes(show_slug, {'episodes': show_data['episodes']})
                 progress_queue.put({'type': 'saved', 'total': len(show_data['episodes'])})
 
-                # Warm thumbnail cache
-                try:
-                    urls_to_prefetch = []
-                    show_thumb = shows[url].get('thumbnail')
-                    if show_thumb:
-                        urls_to_prefetch.append(show_thumb)
-                    for ep in show_data.get('episodes', [])[:200]:
-                        thumb = ep.get('image_url')
-                        if thumb:
-                            urls_to_prefetch.append(thumb)
-                    if urls_to_prefetch and image_cache_service:
-                        image_cache_service.prefetch_many(urls_to_prefetch, concurrency=8)
-                except Exception:
-                    pass
-
-                # Auto-trigger sync after adding a new show
-                try:
-                    from .api_db import get_running_sync_job, start_sync_job
-
-                    existing_sync = get_running_sync_job()
-                    if existing_sync:
-                        _queue_sync_status(
-                            progress_queue,
-                            status='started',
-                            sync_job_id=existing_sync,
-                            message='Waiting for in-progress database sync...',
-                        )
-                        sync_job_id = existing_sync
-                    else:
-                        sync_job_id = start_sync_job(trigger='auto_subscribe')
-                        _queue_sync_status(
-                            progress_queue,
-                            status='started',
-                            sync_job_id=sync_job_id,
-                            message='Syncing database...',
-                        )
-
-                    sync_completed = _wait_for_sync_completion(progress_queue, sync_job_id)
-                    if not sync_completed:
-                        progress_queue.put({
-                            'type': 'error',
-                            'message': 'Show was saved, but the database sync did not finish. Discover, stats, and admin may update after the next successful sync.',
-                        })
-                        return
-                except Exception as sync_err:
-                    _queue_sync_status(
-                        progress_queue,
-                        status='failed',
-                        error=str(sync_err),
-                        message=f'Sync failed: {sync_err}',
-                    )
-                    progress_queue.put({
-                        'type': 'error',
-                        'message': 'Show was saved, but the database sync failed. Discover, stats, and admin may update after the next successful sync.',
-                    })
-                    return
-
+                # Complete immediately so the UI unblocks
                 progress_queue.put({'type': 'completed', 'total': len(show_data['episodes'])})
+
+                # Fire-and-forget: thumbnail prefetch + DB sync in background
+                _post_subscribe_tasks(app, shows, url, show_data, image_cache_service)
 
             except Exception as e:
                 progress_queue.put({'type': 'error', 'message': str(e)})
@@ -260,6 +239,10 @@ def subscribe_progress(subscribe_id):
     q = app.subscribe_queues.get(subscribe_id)
 
     def generate():
+        if q is None:
+            # Queue gone (already completed or invalid ID) — tell client to stop
+            yield f"data: {json.dumps({'type': 'error', 'message': 'Subscribe session expired. Please reload.'})}\n\n"
+            return
         try:
             while True:
                 try:

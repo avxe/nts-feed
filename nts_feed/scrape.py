@@ -180,7 +180,6 @@ def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False):
             { 'type': 'progress', 'current': int, 'total': int, 'episode_title': str }
             { 'type': 'completed', 'total': int }
         defer_tracklists: If True, skip fetching tracklists (they load on-demand later).
-            This makes subscription near-instant.
 
     Returns:
         dict with keys: title, description, thumbnail, episodes
@@ -344,14 +343,13 @@ def scrape_nts_show_progress(url, on_progress=None, defer_tracklists=False):
                     'title': ep_info['title'],
                     'date': ep_info['date'],
                     'audio_url': ep_info['episode_url'],
-                    'genres': [],  # Will be fetched on-demand
-                    'tracklist': [],  # Will be fetched on-demand
+                    'genres': [],
+                    'tracklist': [],
                     'image_url': ep_info['image_url'],
                     'url': ep_info['episode_url'],
                     'is_new': True
                 }
                 episodes.append(episode)
-                
                 if callable(on_progress):
                     on_progress({
                         'type': 'progress',
@@ -489,13 +487,13 @@ def save_episodes(show_slug, episodes_data):
     store = get_episodes_store(show_slug)
     store.write(episodes_data)
 
-def backfill_tracklists_for_show(show_url: str) -> int:
-    """Re-parse all stored episodes for a show and refresh tracklists using
-    the current scraping/merging logic. Returns number of episodes updated.
+def backfill_tracklists_for_show(show_url: str, batch_size: int = 10) -> int:
+    """Backfill tracklists for episodes that don't have them yet.
 
-    This preserves existing episode metadata (title, date, image_url, url),
-    only replacing the `tracklist` and `genres` fields if newly parsed data is
-    available. It also keeps the `is_new` flag intact.
+    Processes episodes concurrently in batches, saving after each batch so
+    episodes appear progressively on the show page.
+
+    Returns number of episodes updated.
     """
     try:
         show_slug = slugify(show_url)
@@ -504,33 +502,46 @@ def backfill_tracklists_for_show(show_url: str) -> int:
         if not episodes:
             return 0
 
-        updated = 0
-        for ep in episodes:
-            try:
-                ep_url = ep.get('url') or ep.get('audio_url')
-                if not ep_url:
-                    continue
-                # Invalidate caches to force fresh parse/merge with latest logic
-                try:
-                    cache_service.delete('episode_page', ep_url)
-                    cache_service.delete('episode_tracks_api', ep_url)
-                except Exception:
-                    pass
-                page = _fetch_episode_page(ep_url)
-                if not page:
-                    continue
-                tl = page.get('tracklist') or []
-                genres = page.get('genres') or []
-                if tl:
-                    ep['tracklist'] = tl
-                    updated += 1
-                if genres:
-                    ep['genres'] = genres
-            except Exception:
-                # continue best-effort across episodes
-                continue
+        # Find episodes that need tracklists
+        needs_backfill = [
+            (i, ep) for i, ep in enumerate(episodes)
+            if not ep.get('tracklist') and (ep.get('url') or ep.get('audio_url'))
+        ]
+        if not needs_backfill:
+            return 0
 
-        save_episodes(show_slug, {'episodes': episodes})
+        updated = 0
+
+        def _fetch_one(idx_ep):
+            idx, ep = idx_ep
+            ep_url = ep.get('url') or ep.get('audio_url')
+            try:
+                cache_service.delete('episode_page', ep_url)
+                cache_service.delete('episode_tracks_api', ep_url)
+            except Exception:
+                pass
+            page = _fetch_episode_page(ep_url)
+            if not page:
+                return idx, None, None
+            return idx, page.get('tracklist') or [], page.get('genres') or []
+
+        # Process in batches, save after each for progressive loading
+        for batch_start in range(0, len(needs_backfill), batch_size):
+            batch = needs_backfill[batch_start:batch_start + batch_size]
+            batch_updated = 0
+
+            with ThreadPoolExecutor(max_workers=min(EPISODE_FETCH_WORKERS, len(batch))) as executor:
+                for idx, tracklist, genres in executor.map(_fetch_one, batch):
+                    if tracklist:
+                        episodes[idx]['tracklist'] = tracklist
+                        batch_updated += 1
+                    if genres:
+                        episodes[idx]['genres'] = genres
+
+            if batch_updated > 0:
+                save_episodes(show_slug, {'episodes': episodes})
+                updated += batch_updated
+
         return updated
     except Exception:
         return 0

@@ -958,11 +958,32 @@ async function initShowPageCore(options = {}) {
                     await handleDownloadAll(menuItem);
                 } else if (action === 'toggle-auto-download') {
                     await handleToggleAutoDownload(menuItem);
+                } else if (action === 'delete-show') {
+                    await handleDeleteShow(menuItem);
                 }
             });
         });
     }
     
+    async function handleDeleteShow(menuItem) {
+        const showUrl = menuItem.dataset.showUrl;
+        if (!showUrl) return;
+
+        const title = document.querySelector('.page-title')?.textContent || 'this show';
+        if (!confirm(`Delete "${title}"? This will remove the show and all its episodes.`)) return;
+
+        try {
+            const response = await fetch(`/delete/${encodeURIComponent(showUrl)}`, { method: 'POST', redirect: 'follow' });
+            if (response.ok || response.redirected) {
+                window.location.href = '/';
+            } else {
+                showNotification('Failed to delete show', 'error');
+            }
+        } catch (e) {
+            showNotification('Failed to delete show', 'error');
+        }
+    }
+
     async function handleUpdateShow(menuItem) {
         try {
             menuItem.classList.add('loading');
@@ -1484,6 +1505,7 @@ async function initShowPageCore(options = {}) {
     // Initialize infinite scrolling for episodes list
     const infiniteScrollController = initEpisodesInfiniteScroll();
     showPageCleanupResources.infiniteScrollObserver = infiniteScrollController?.observer || null;
+
 
     // Handle #ep=<encoded episode url> fragment - MUST be after initEpisodesInfiniteScroll
     // so the IntersectionObserver is already set up when we try to trigger it
