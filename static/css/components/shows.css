@@ -395,6 +395,12 @@
     flex: 1;
 }
 
+.show-menu-divider {
+    height: 1px;
+    background: var(--color-border);
+    margin: 4px 0;
+}
+
 .show-menu-item-danger {
     color: var(--color-error);
 }

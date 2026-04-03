@@ -78,8 +78,10 @@
                 }
             };
             evt.onerror = () => {
+                // Always close on error — EventSource auto-reconnects otherwise,
+                // which causes infinite loops after the stream completes
+                evt.close();
                 if (!finished) {
-                    evt.close();
                     handlers.onError?.('Connection lost');
                     reject(new Error('Connection lost'));
                 }

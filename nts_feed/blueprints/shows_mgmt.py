@@ -239,6 +239,10 @@ def subscribe_progress(subscribe_id):
     q = app.subscribe_queues.get(subscribe_id)
 
     def generate():
+        if q is None:
+            # Queue gone (already completed or invalid ID) — tell client to stop
+            yield f"data: {json.dumps({'type': 'error', 'message': 'Subscribe session expired. Please reload.'})}\n\n"
+            return
         try:
             while True:
                 try:

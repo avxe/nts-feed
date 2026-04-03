@@ -28,12 +28,17 @@
                             <span>Download All Episodes</span>
                             <div class="loading-spinner"></div>
                         </div>
-                        <div class="show-menu-item" data-action="toggle-auto-download" 
+                        <div class="show-menu-item" data-action="toggle-auto-download"
                             data-enabled="{{ 'true' if show_data.auto_download else 'false' }}">
                             <i class="fas fa-magic"></i>
                             <span>Auto-download</span>
                             <span class="auto-status">{{ 'On' if show_data.auto_download else 'Off' }}</span>
                             <div class="loading-spinner"></div>
+                        </div>
+                        <div class="show-menu-divider"></div>
+                        <div class="show-menu-item show-menu-item-danger" data-action="delete-show" data-show-url="{{ show_url }}">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>Delete Show</span>
                         </div>
                     </div>
                 </div>
