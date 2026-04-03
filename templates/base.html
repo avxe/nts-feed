@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>{% block title %}NTS Feed{% endblock %}</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png') }}" sizes="32x32">
     
@@ -129,6 +129,30 @@
         </div>
     </div>
     
+    <!-- Bottom tab bar for mobile -->
+    <nav class="bottom-tab-bar" aria-label="Mobile navigation">
+        <a href="{{ url_for('pages.index') }}" class="bottom-tab" aria-label="Feed">
+            <i class="fas fa-stream"></i>
+            <span>Feed</span>
+        </a>
+        <a href="{{ url_for('pages.shows_page') }}" class="bottom-tab" aria-label="Shows">
+            <i class="fas fa-broadcast-tower"></i>
+            <span>Shows</span>
+        </a>
+        <a href="/discover" class="bottom-tab" aria-label="Discover">
+            <i class="fas fa-compass"></i>
+            <span>Discover</span>
+        </a>
+        <a href="{{ url_for('pages.likes_page') }}" class="bottom-tab" aria-label="Likes">
+            <i class="fas fa-heart"></i>
+            <span>Likes</span>
+        </a>
+        <a href="{{ url_for('pages.stats_page') }}" class="bottom-tab" aria-label="Tracks">
+            <i class="fas fa-table"></i>
+            <span>Tracks</span>
+        </a>
+    </nav>
+
     <!-- YouTube player container - persists across page navigation -->
     <div id="youtube-player-root"></div>
     

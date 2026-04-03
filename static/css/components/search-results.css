@@ -732,7 +732,7 @@ div.container.search-container .search-results {
 /* ====================================
    Responsive
 ======================================= */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .container.search-container {
         padding-top: var(--space-sm);
     }
@@ -746,13 +746,16 @@ div.container.search-container .search-results {
         gap: var(--space-xs);
     }
 
+    /* Horizontally scrollable tabs */
     .container.search-container .search-tabs {
         gap: 4px;
+        -webkit-overflow-scrolling: touch;
     }
 
     .container.search-container .search-tab {
-        padding: 5px 10px;
+        padding: 8px 12px;
         font-size: 0.8rem;
+        min-height: var(--touch-target-min);
     }
 
     .container.search-container .tab-label {
@@ -781,14 +784,13 @@ div.container.search-container .search-results {
         padding-top: var(--space-xs);
     }
 
-    /* Show track actions always on mobile */
+    /* Show track actions always on touch */
     .container.search-container .track-card-score,
     .container.search-container .track-play-btn {
         opacity: 1;
         pointer-events: auto;
     }
 
-    /* Episode links: slightly less padding on mobile */
     .container.search-container .results-list--tracks .track-card-episodes {
         padding-left: 0;
     }
@@ -799,6 +801,15 @@ div.container.search-container .search-results {
 
     .container.search-container .results-list--tracks .track-episode-sep {
         display: none;
+    }
+
+    /* Bigger touch targets for search result items */
+    .container.search-container .search-episode-card {
+        padding: var(--space-sm);
+    }
+
+    .container.search-container .search-track-card {
+        padding: 8px;
     }
 }
 
