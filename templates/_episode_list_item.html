@@ -18,12 +18,6 @@
                 <span class="button-text">Download</span>
             </a>
             {% endif %}
-
-            <div class="download-progress">
-                <div class="progress-bar"></div>
-                <div class="progress-info"></div>
-                <button class="cancel-download">Cancel Download</button>
-            </div>
         </div>
     </div>
 
@@ -47,10 +41,36 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        {# Mobile-only download button — the left-column download section is hidden on mobile feed #}
+        <div class="episode-mobile-actions">
+            {% if episode.is_downloaded %}
+            <button class="download-button downloaded" disabled>
+                <span class="button-text">Downloaded</span>
+            </button>
+            {% else %}
+            <a href="{{ url_for('downloads.download_episode', url=episode.audio_url) }}" class="download-button">
+                <span class="button-text">Download</span>
+            </a>
+            {% endif %}
+        </div>
+
+        {# Download progress — lives in episode-info so it's always reachable by JS,
+           even on mobile where episode-download-section is hidden. #}
+        <div class="download-progress">
+            <div class="progress-bar"></div>
+            <div class="progress-info"></div>
+            <button class="cancel-download">Cancel Download</button>
+        </div>
+
         {% if episode.tracklist %}
         <div class="episode-tracklist">
             <div class="tracklist-header">
                 <h3>Tracklist</h3>
+                <button class="tracklist-toggle-btn" aria-expanded="false" aria-label="Toggle tracklist">
+                    <span class="tracklist-toggle-label">{{ episode.tracklist|length }} tracks</span>
+                    <i class="fas fa-chevron-down tracklist-toggle-icon"></i>
+                </button>
             </div>
             <ul class="tracks-list">
                 {% for track in episode.tracklist %}

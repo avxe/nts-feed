@@ -351,7 +351,7 @@
     box-shadow: 0 4px 12px var(--color-shadow),
                 0 8px 24px var(--color-shadow);
     min-width: 200px;
-    z-index: 1000;
+    z-index: 1002;
     opacity: 0;
     visibility: hidden;
     transform: translateY(-8px);
@@ -476,6 +476,13 @@
     .show-menu-trigger {
         opacity: 1;
         transform: scale(1);
+    }
+
+    /* On the show page, the ⋮ button is on the LEFT side of the header —
+       open the dropdown rightward so it doesn't clip off-screen. */
+    .page-header .show-menu-dropdown {
+        left: 0;
+        right: auto;
     }
 }
 

@@ -293,4 +293,14 @@
     
     document.addEventListener('spa:pagechange', initGlobalSubscribeModal);
     document.addEventListener('spa:pagechange', updateActiveNav);
+
+    // Global tracklist toggle — handles mobile "N tracks" expand/collapse buttons
+    document.addEventListener('click', function(e) {
+        var btn = e.target.closest('.tracklist-toggle-btn');
+        if (!btn) return;
+        var tracklist = btn.closest('.episode-tracklist');
+        if (!tracklist) return;
+        var expanded = tracklist.classList.toggle('expanded');
+        btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    });
 })();

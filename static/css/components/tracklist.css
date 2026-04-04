@@ -22,6 +22,11 @@
     align-items: center;
 }
 
+/* Toggle button — hidden on desktop, shown on mobile via responsive.css */
+.tracklist-toggle-btn {
+    display: none;
+}
+
 .tracks-list {
     list-style: none;
     padding: 0;

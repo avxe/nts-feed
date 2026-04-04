@@ -79,10 +79,11 @@
 ======================================= */
 @media (max-width: 767px) {
     .episode-item {
-        grid-template-columns: var(--mobile-card-thumb) 1fr !important;
-        gap: var(--space-md);
-        padding: var(--space-sm);
+        grid-template-columns: 90px 1fr !important;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
         align-items: start;
+        border-radius: var(--border-radius-lg);
     }
 
     .episode-left-column {
@@ -91,12 +92,12 @@
 
     .episode-thumbnail {
         aspect-ratio: 1;
-        width: var(--mobile-card-thumb);
-        height: var(--mobile-card-thumb);
+        width: 90px;
+        height: 90px;
         border-radius: var(--border-radius-md);
     }
 
-    /* Hide the download section under the thumbnail on mobile — keep it in the info area */
+    /* Hide the download section under the thumbnail on mobile feed — shown via .episode-mobile-actions instead */
     .episode-download-section {
         display: none;
     }
@@ -131,9 +132,52 @@
         font-size: 0.75em;
     }
 
-    /* Collapse tracklist on mobile feed cards */
-    .episode-tracklist {
+    /* Mobile download button in info section — only for non-show-page cards */
+    .episode-mobile-actions {
+        display: flex;
+        gap: var(--space-sm);
+        margin-top: var(--space-xs);
+    }
+
+    .episode-mobile-actions .download-button {
+        flex: 1;
+        justify-content: center;
+        font-size: 0.82em;
+        padding: 7px var(--space-sm);
+        min-height: var(--touch-target-min);
+    }
+
+    /* Collapse tracklist on mobile feed cards — toggle via .expanded class */
+    .episode-tracklist .tracklist-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--space-xs);
+        background: none;
+        border: none;
+        padding: 4px 0;
+        color: var(--color-text-secondary);
+        font-size: 0.8em;
+        font-family: inherit;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .episode-tracklist .tracklist-toggle-icon {
+        font-size: 0.75em;
+        transition: transform var(--transition-base);
+    }
+
+    .episode-tracklist.expanded .tracklist-toggle-icon {
+        transform: rotate(180deg);
+    }
+
+    /* Hide tracks list unless expanded; show page always overrides below */
+    .episode-tracklist .tracks-list {
         display: none;
+    }
+
+    .episode-tracklist.expanded .tracks-list {
+        display: flex;
     }
 
     .episodes-list {
@@ -168,12 +212,40 @@
         min-width: 100%;
         max-width: 100%;
     }
+
+    /* Show page header: genre search stretches to fill available row space */
+    .page-actions .search-container {
+        flex: 1;
+        min-width: 0;
+        max-width: none;
+        width: auto;
+    }
+
+    /* Page title on mobile show page */
+    .page-title {
+        font-size: 1.3rem;
+        line-height: 1.25;
+    }
 }
 
 /* Show page: keep tracklist visible even on mobile (not feed) */
 @media (max-width: 767px) {
     .show-page .episode-tracklist {
         display: block;
+    }
+
+    /* Always show the track list on show page — no toggle needed */
+    .show-page .episode-tracklist .tracklist-toggle-btn {
+        display: none;
+    }
+
+    .show-page .episode-tracklist .tracks-list {
+        display: flex;
+    }
+
+    /* No duplicate download button on show page — the left-column section handles it */
+    .show-page .episode-mobile-actions {
+        display: none;
     }
 
     /* Show page episodes get a larger thumbnail */
@@ -193,6 +265,13 @@
         flex-direction: row;
         align-items: center;
         gap: var(--space-sm);
+    }
+
+    /* Make the show-page download button full-width and well-padded */
+    .show-page .episode-download-section .download-button {
+        flex: 1;
+        justify-content: center;
+        min-height: var(--touch-target-min);
     }
 }
 

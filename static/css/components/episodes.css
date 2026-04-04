@@ -211,4 +211,9 @@
     gap: var(--spacing-base);
 }
 
-/* .genre-tag is now defined in chips.css */ 
+/* .genre-tag is now defined in chips.css */
+
+/* Mobile-only download row — hidden on desktop, shown via responsive.css on mobile */
+.episode-mobile-actions {
+    display: none;
+}
